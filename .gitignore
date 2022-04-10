@@ -1,0 +1,12 @@
+*.log
+*.pyc
+.cache/
+.coverage
+.idea/
+.vscode/
+sphere_3d_engine.egg-info/
+build/
+dist/
+docs/build/
+venv/
+wheelhouse/
