@@ -3,6 +3,26 @@ import nj from "numjs";
 import { GT } from "../utils/GT";
 import { v4 } from "uuid";
 
+const moveCenter = (
+  _: SphereType,
+  __: string,
+  descriptor: PropertyDescriptor
+) => {
+  const originalMethod = descriptor.value;
+
+  descriptor.value = function (...args: number[]) {
+    const self = this as SphereType;
+    const referenceCenter = self.center; //move center to prevent displacement
+    self.translate(
+      -referenceCenter[0],
+      -referenceCenter[1],
+      -referenceCenter[2]
+    );
+    originalMethod.apply(this, args);
+    self.translate(referenceCenter[0], referenceCenter[1], referenceCenter[2]);
+  };
+};
+
 export type SphereType = {
   meridiansAmout: number;
   parallelsAmount: number;
@@ -15,6 +35,7 @@ export type SphereType = {
   // meridiansEnd: number[]
   // vertices: number[][][]
   // faces: []
+  updateData: (data: UpdateSphereType) => void;
   drawVertices: (p5: p5Types) => void;
   drawEdges: (p5: p5Types) => void;
   translate: (dx: number, dy: number, dz: number) => void;
@@ -31,9 +52,17 @@ export type SphereConstructorType = {
   color: string;
 };
 
+type UpdateSphereType = {
+  meridians?: number;
+  parallels?: number;
+  radius?: number;
+  name?: string;
+  color?: string;
+};
+
 export class Sphere {
-  readonly meridiansAmout: number;
-  readonly parallelsAmount: number;
+  public meridiansAmout: number;
+  public parallelsAmount: number;
   radius: number;
   center: number[];
   readonly id: string;
@@ -52,20 +81,20 @@ export class Sphere {
     color,
     center = [0, 0, 0],
   }: SphereConstructorType) {
-    this.meridiansAmout = +meridians;
-    this.parallelsAmount = +parallels;
-    this.radius = +radius;
+    this.meridiansAmout = meridians;
+    this.parallelsAmount = parallels;
+    this.radius = radius;
     this.center = center;
     this.name = name;
     this.id = v4();
     this.color = color;
 
     this.meridiansBegin = nj
-      .add(nj.array(center), nj.array([0.0, +radius, 0.0]))
+      .add(nj.array(center), nj.array([0.0, -radius, 0.0]))
       .tolist();
 
     this.meridiansEnd = nj
-      .add(nj.array(center), nj.array([0.0, -+radius, 0.0]))
+      .add(nj.array(center), nj.array([0.0, radius, 0.0]))
       .tolist();
 
     // create matrix of vertices
@@ -127,20 +156,20 @@ export class Sphere {
     p5.stroke("yellow");
     p5.strokeWeight(5);
 
+    p5.point(this.meridiansEnd[0], this.meridiansEnd[1], this.meridiansEnd[2]);
+    flattenVertices.forEach((vertex: number[]) => {
+      p5.point(vertex[0], vertex[1], vertex[2]);
+    });
     p5.point(
       this.meridiansBegin[0],
       this.meridiansBegin[1],
       this.meridiansBegin[2]
     );
-    flattenVertices.forEach((vertex: number[]) => {
-      p5.point(vertex[0], vertex[1], vertex[2]);
-    });
-    p5.point(this.meridiansEnd[0], this.meridiansEnd[1], this.meridiansEnd[2]);
     p5.pop();
   }
 
   public drawEdges(p5: p5Types) {
-    const extremes = [this.meridiansBegin, this.meridiansEnd];
+    const extremes = [this.meridiansEnd, this.meridiansBegin];
     for (let i = 0; i < 2; i++) {
       const currentParallel = this.vertices[i * (this.parallelsAmount - 1)];
 
@@ -201,6 +230,7 @@ export class Sphere {
       .tolist();
   }
 
+  @moveCenter
   public scale(sx: number, sy: number, sz: number) {
     const [newCenter, newMeridiansBegin, newMeridiansEnd] = GT.scale(
       [this.center, this.meridiansBegin, this.meridiansEnd],
@@ -220,13 +250,8 @@ export class Sphere {
       .tolist();
   }
 
+  @moveCenter
   public rotate(angle: number, axis: string) {
-    const referenceCenter = this.center;
-    this.translate(
-      -referenceCenter[0],
-      -referenceCenter[1],
-      -referenceCenter[2]
-    );
     const [newCenter, newMeridiansBegin, newMeridiansEnd] = GT.rotate(
       angle,
       [this.center, this.meridiansBegin, this.meridiansEnd],
@@ -242,7 +267,39 @@ export class Sphere {
       .array(flatVertices)
       .reshape(this.parallelsAmount, this.meridiansAmout, 3)
       .tolist();
-    this.translate(referenceCenter[0], referenceCenter[1], referenceCenter[2]);
+  }
+
+  public updateData({
+    radius,
+    parallels,
+    meridians,
+    name,
+    color,
+  }: UpdateSphereType) {
+    this.radius = radius || this.radius;
+    this.parallelsAmount = parallels || this.parallelsAmount;
+    this.meridiansAmout = meridians || this.meridiansAmout;
+    this.name = name || this.name;
+    this.color = color || this.color;
+
+    this.meridiansBegin = [
+      this.center[0],
+      this.center[1] - this.radius,
+      this.center[2],
+    ];
+
+    this.meridiansEnd = [
+      this.center[0],
+      this.center[1] + this.radius,
+      this.center[2],
+    ];
+
+    this.vertices = nj
+      .zeros(this.meridiansAmout * this.parallelsAmount * 3)
+      .reshape(this.parallelsAmount, this.meridiansAmout, 3)
+      .tolist();
+
+    this.defineVertices();
   }
 }
 
