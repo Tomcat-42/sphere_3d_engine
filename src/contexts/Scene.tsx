@@ -9,6 +9,7 @@ type SceneContextType = {
   translateSelectedObject: (dx: number, dy: number, dz: number) => void;
   scaleSelectedObject: (sx: number, sy: number, sz: number) => void;
   rotateSelectedObject: (axis: "x" | "y" | "z", angle: number) => void;
+  clearInterface: () => void;
 };
 
 export const SceneContext = createContext({} as SceneContextType);
@@ -41,6 +42,11 @@ export const SceneContextProvider = ({ children }: { children: ReactNode }) => {
     selectedSphere?.rotate(angle, axis);
   };
 
+  const clearInterface = () => {
+    setSceneObjects([]);
+    setSelectedSphereId(null);
+  };
+
   return (
     <SceneContext.Provider
       value={{
@@ -51,6 +57,7 @@ export const SceneContextProvider = ({ children }: { children: ReactNode }) => {
         translateSelectedObject,
         scaleSelectedObject,
         rotateSelectedObject,
+        clearInterface,
       }}
     >
       {children}
