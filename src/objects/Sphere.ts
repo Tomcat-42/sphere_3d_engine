@@ -1,44 +1,47 @@
-import p5Types from 'p5'
-import nj from 'numjs'
-import { rotatePoint } from '../utils/rotatePoint'
-import { v4 } from 'uuid'
+import p5Types from "p5";
+import nj from "numjs";
+import { GT } from "../utils/GT";
+import { v4 } from "uuid";
 
 export type SphereType = {
-  meridiansAmout: number
-  parallelsAmount: number
-  radius: number
-  center: number[]
-  readonly id: string
-  name: string
-  color: string
+  meridiansAmout: number;
+  parallelsAmount: number;
+  radius: number;
+  center: number[];
+  readonly id: string;
+  name: string;
+  color: string;
   // meridiansBegin: number[]
   // meridiansEnd: number[]
   // vertices: number[][][]
   // faces: []
-  drawVertices: (p5: p5Types) => void
-  drawEdges: (p5: p5Types) => void
-}
+  drawVertices: (p5: p5Types) => void;
+  drawEdges: (p5: p5Types) => void;
+  translate: (dx: number, dy: number, dz: number) => void;
+  scale: (sx: number, sy: number, sz: number) => void;
+  rotate: (angle: number, axis: string) => void;
+};
 
 export type SphereConstructorType = {
-  meridians: number
-  parallels: number
-  radius: number
-  center: number[]
-  name: string
-  color: string
-}
+  meridians: number;
+  parallels: number;
+  radius: number;
+  center: number[];
+  name: string;
+  color: string;
+};
 
 export class Sphere {
-  readonly meridiansAmout: number
-  readonly parallelsAmount: number
-  readonly radius: number
-  readonly center: number[]
-  readonly id: string
-  public name: string
-  public color: string
-  private meridiansBegin: number[]
-  private meridiansEnd: number[]
-  private vertices: number[][][]
+  readonly meridiansAmout: number;
+  readonly parallelsAmount: number;
+  radius: number;
+  center: number[];
+  readonly id: string;
+  public name: string;
+  public color: string;
+  private meridiansBegin: number[];
+  private meridiansEnd: number[];
+  private vertices: number[][][];
   // private faces: []
 
   constructor({
@@ -49,109 +52,100 @@ export class Sphere {
     color,
     center = [0, 0, 0],
   }: SphereConstructorType) {
-    this.meridiansAmout = +meridians
-    this.parallelsAmount = +parallels
-    this.radius = +radius
-    this.center = center
-    this.name = name
-    this.id = v4()
-    this.color = color
+    this.meridiansAmout = +meridians;
+    this.parallelsAmount = +parallels;
+    this.radius = +radius;
+    this.center = center;
+    this.name = name;
+    this.id = v4();
+    this.color = color;
 
     this.meridiansBegin = nj
       .add(nj.array(center), nj.array([0.0, +radius, 0.0]))
-      .tolist()
+      .tolist();
 
     this.meridiansEnd = nj
       .add(nj.array(center), nj.array([0.0, -+radius, 0.0]))
-      .tolist()
+      .tolist();
 
     // create matrix of vertices
     this.vertices = nj
       .zeros(this.meridiansAmout * this.parallelsAmount * 3)
       .reshape(this.parallelsAmount, this.meridiansAmout, 3)
-      .tolist()
+      .tolist();
 
     // create matrix of indices for faces
     // this.faces = []
-    this.center = center
+    this.center = center;
 
-    this.defineVertices()
+    this.defineVertices();
     // this.defineFaces()
   }
 
   private defineVertices() {
-    const angleMeridians = 360 / this.meridiansAmout
-    const angleParallels = 180 / (this.parallelsAmount + 1)
+    const angleMeridians = 360 / this.meridiansAmout;
+    const angleParallels = 180 / (this.parallelsAmount + 1);
 
     for (let i = 0; i < this.parallelsAmount; i++) {
-      this.vertices[i][0] = rotatePoint(
+      this.vertices[i][0] = GT.rotate(
         -(angleParallels * (i + 1)),
-        0,
-        this.radius,
-        0,
-        'z',
-      )
+        [[0, this.radius, 0]],
+        "z"
+      )[0];
 
       for (let j = 1; j < this.meridiansAmout; j++) {
         this.vertices[i][j] = nj
           .add(
             nj.array(
-              rotatePoint(
+              GT.rotate(
                 -(angleMeridians * j),
-                this.vertices[i][0][0],
-                this.vertices[i][0][1],
-                this.vertices[i][0][2],
-                'y',
-              ),
+                [
+                  [
+                    this.vertices[i][0][0],
+                    this.vertices[i][0][1],
+                    this.vertices[i][0][2],
+                  ],
+                ],
+                "y"
+              )[0]
             ),
-            nj.array(this.center),
+            nj.array(this.center)
           )
-          .tolist()
+          .tolist();
       }
       // add center after because the original point is used to define the parallels
       this.vertices[i][0] = nj
-        .add(
-          nj.array(this.vertices[i][0]),
-          nj.array(this.center),
-        )
-        .tolist()
+        .add(nj.array(this.vertices[i][0]), nj.array(this.center))
+        .tolist();
     }
   }
 
   public drawVertices(p5: p5Types) {
-    const flattenVertices = this.vertices.flat()
+    const flattenVertices = this.vertices.flat();
 
-    p5.push()
-    p5.stroke('yellow')
-    p5.strokeWeight(5)
+    p5.push();
+    p5.stroke("yellow");
+    p5.strokeWeight(5);
 
     p5.point(
       this.meridiansBegin[0],
       this.meridiansBegin[1],
-      this.meridiansBegin[2],
-    )
+      this.meridiansBegin[2]
+    );
     flattenVertices.forEach((vertex: number[]) => {
-      p5.point(vertex[0], vertex[1], vertex[2])
-    })
-    p5.point(
-      this.meridiansEnd[0],
-      this.meridiansEnd[1],
-      this.meridiansEnd[2],
-    )
-    p5.pop()
+      p5.point(vertex[0], vertex[1], vertex[2]);
+    });
+    p5.point(this.meridiansEnd[0], this.meridiansEnd[1], this.meridiansEnd[2]);
+    p5.pop();
   }
 
   public drawEdges(p5: p5Types) {
-    const extremes = [
-      this.meridiansBegin,
-      this.meridiansEnd,
-    ]
+    const extremes = [this.meridiansBegin, this.meridiansEnd];
     for (let i = 0; i < 2; i++) {
-      const currentParallel =
-        this.vertices[i * (this.parallelsAmount - 1)]
+      const currentParallel = this.vertices[i * (this.parallelsAmount - 1)];
 
-      p5.push()
-      p5.stroke(this.color)
+      p5.push();
+      p5.stroke(this.color);
       currentParallel.forEach((currrentPoint: number[]) => {
         p5.line(
           currrentPoint[0],
@@ -159,36 +153,96 @@ export class Sphere {
           currrentPoint[2],
           extremes[i][0],
           extremes[i][1],
-          extremes[i][2],
-        )
-      })
+          extremes[i][2]
+        );
+      });
     }
     this.vertices.forEach((line: any, i: number) => {
-      line.forEach(
-        (point: [number, number, number], j: number) => {
-          const nextParallelPoint: any =
-            this.vertices[i][(j + 1) % this.meridiansAmout]
-          const nextMeridianPoint: any =
-            i === this.parallelsAmount - 1
-              ? this.vertices[i][j]
-              : this.vertices[i + 1][j]
+      line.forEach((point: [number, number, number], j: number) => {
+        const nextParallelPoint: any =
+          this.vertices[i][(j + 1) % this.meridiansAmout];
+        const nextMeridianPoint: any =
+          i === this.parallelsAmount - 1
+            ? this.vertices[i][j]
+            : this.vertices[i + 1][j];
 
-          p5.line(
-            ...point,
-            nextParallelPoint[0],
-            nextParallelPoint[1],
-            nextParallelPoint[2],
-          )
-          p5.line(
-            nextMeridianPoint[0],
-            nextMeridianPoint[1],
-            nextMeridianPoint[2],
-            ...point,
-          )
-        },
-      )
-    })
-    p5.pop()
+        p5.line(
+          ...point,
+          nextParallelPoint[0],
+          nextParallelPoint[1],
+          nextParallelPoint[2]
+        );
+        p5.line(
+          nextMeridianPoint[0],
+          nextMeridianPoint[1],
+          nextMeridianPoint[2],
+          ...point
+        );
+      });
+    });
+    p5.pop();
+  }
+
+  public translate(dx: number, dy: number, dz: number) {
+    const [newCenter, newMeridiansBegin, newMeridiansEnd] = GT.translate(
+      [this.center, this.meridiansBegin, this.meridiansEnd],
+      dx,
+      dy,
+      dz
+    );
+    this.center = newCenter;
+    this.meridiansBegin = newMeridiansBegin;
+    this.meridiansEnd = newMeridiansEnd;
+
+    const flatVertices = GT.translate(this.vertices.flat(), dx, dy, dz);
+    this.vertices = nj
+      .array(flatVertices)
+      .reshape(this.parallelsAmount, this.meridiansAmout, 3)
+      .tolist();
+  }
+
+  public scale(sx: number, sy: number, sz: number) {
+    const [newCenter, newMeridiansBegin, newMeridiansEnd] = GT.scale(
+      [this.center, this.meridiansBegin, this.meridiansEnd],
+      sx,
+      sy,
+      sz
+    );
+
+    this.center = newCenter;
+    this.meridiansBegin = newMeridiansBegin;
+    this.meridiansEnd = newMeridiansEnd;
+
+    const flatVertices = GT.scale(this.vertices.flat(), sx, sy, sz);
+    this.vertices = nj
+      .array(flatVertices)
+      .reshape(this.parallelsAmount, this.meridiansAmout, 3)
+      .tolist();
+  }
+
+  public rotate(angle: number, axis: string) {
+    const referenceCenter = this.center;
+    this.translate(
+      -referenceCenter[0],
+      -referenceCenter[1],
+      -referenceCenter[2]
+    );
+    const [newCenter, newMeridiansBegin, newMeridiansEnd] = GT.rotate(
+      angle,
+      [this.center, this.meridiansBegin, this.meridiansEnd],
+      axis
+    );
+
+    this.center = newCenter;
+    this.meridiansBegin = newMeridiansBegin;
+    this.meridiansEnd = newMeridiansEnd;
+
+    const flatVertices = GT.rotate(angle, this.vertices.flat(), axis);
+    this.vertices = nj
+      .array(flatVertices)
+      .reshape(this.parallelsAmount, this.meridiansAmout, 3)
+      .tolist();
+    this.translate(referenceCenter[0], referenceCenter[1], referenceCenter[2]);
   }
 }
 
