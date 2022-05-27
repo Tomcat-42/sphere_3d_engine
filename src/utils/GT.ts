@@ -1,8 +1,5 @@
 import nj from "numjs";
-
-const degreesToRaians = (degrees: number) => {
-  return degrees * (Math.PI / 180);
-};
+import { degreesToRaians } from "./math";
 
 export class GT {
   public static rotate(

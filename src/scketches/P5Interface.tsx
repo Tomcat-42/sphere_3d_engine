@@ -1,10 +1,20 @@
 import Sketch from "react-p5";
 import p5Types from "p5";
-import { SphereType } from "../objects/Sphere";
+import { Sphere, SphereType } from "../objects/Sphere";
 import { useSceneContext } from "../contexts/Scene";
+import { Camera } from "../objects/Camera";
 
 export const P5Interface = () => {
   const { sceneObjects, selectedSphereId } = useSceneContext();
+  // const myCamera = new Camera({ position: [0, 0, -3] });
+  const mySphere = new Sphere({
+    meridians: 10,
+    parallels: 10,
+    radius: 50,
+    center: [0, -50, 0],
+    color: "#ff0000",
+    name: "Felipi",
+  });
 
   const windowResized = (p5: p5Types) => {
     const element = document.getElementById("mainCanvas");
@@ -25,17 +35,20 @@ export const P5Interface = () => {
 
     p5.frameRate(60);
     p5.debugMode();
-    // p5.camera(+150, -150, p5.height / 2 / p5.tan(p5.PI / 6), 0, 0, 0, 0, 1, 0);
+    p5.camera(+150, -150, p5.height / 2 / p5.tan(p5.PI / 6), 0, 0, 0, 0, 1, 0);
   };
 
   const draw = (p5: p5Types) => {
     p5.background("black");
-    // p5.orbitControl();
+    p5.orbitControl();
 
     p5.strokeWeight(0.5);
     sceneObjects?.forEach((sphere: SphereType) => {
       sphere.drawEdges(p5);
     });
+
+    // mySphere.drawEdges(p5);
+    // mySphere.rotate(0.9, "z");
 
     if (selectedSphereId) {
       const selectedSphere = sceneObjects?.find(
