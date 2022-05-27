@@ -1,6 +1,7 @@
 *.log
 *.pyc
 .cache/
+.parcel-cache
 .coverage
 .idea/
 .vscode/
