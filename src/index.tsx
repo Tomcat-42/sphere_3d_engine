@@ -5,19 +5,18 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { SceneContextProvider } from "./contexts/Scene";
 import { Shader } from "./Shader";
+import { P5Interface } from "./scketches/P5Interface";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
-  <React.StrictMode>
-    <SceneContextProvider>
-      {
-        // <Shader />
-        <App />
-      }
-    </SceneContextProvider>
-  </React.StrictMode>
+  <SceneContextProvider>
+    {
+      // <Shader />
+      <App />
+    }
+  </SceneContextProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
