@@ -1,6 +1,11 @@
 import { createContext, ReactNode, useContext, useState } from "react";
 import { SphereType } from "../objects/Sphere";
 
+enum drawModeEnum {
+  perspective = "perspective",
+  axonometric = "axonometric",
+}
+
 type SceneContextType = {
   sceneObjects: SphereType[];
   setSceneObjects: (scene: SphereType[]) => void;
@@ -10,6 +15,9 @@ type SceneContextType = {
   scaleSelectedObject: (sx: number, sy: number, sz: number) => void;
   rotateSelectedObject: (axis: "x" | "y" | "z", angle: number) => void;
   clearInterface: () => void;
+  drawMode: drawModeEnum;
+  setDrawMode: (drawMode: drawModeEnum) => void;
+  drawModeEnum: typeof drawModeEnum;
 };
 
 export const SceneContext = createContext({} as SceneContextType);
@@ -17,6 +25,9 @@ export const SceneContext = createContext({} as SceneContextType);
 export const SceneContextProvider = ({ children }: { children: ReactNode }) => {
   const [sceneObjects, setSceneObjects] = useState<SphereType[]>([]);
   const [selectedSphereId, setSelectedSphereId] = useState<string | null>(null);
+  const [drawMode, setDrawMode] = useState<drawModeEnum>(
+    drawModeEnum.perspective
+  );
 
   const translateSelectedObject = (dx: number, dy: number, dz: number) => {
     const selectedSphere = sceneObjects?.find(
@@ -58,6 +69,9 @@ export const SceneContextProvider = ({ children }: { children: ReactNode }) => {
         scaleSelectedObject,
         rotateSelectedObject,
         clearInterface,
+        drawMode,
+        setDrawMode,
+        drawModeEnum,
       }}
     >
       {children}

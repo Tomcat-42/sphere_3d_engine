@@ -78,7 +78,6 @@ function App() {
   return (
     <Layout
       style={{
-        overflow: "hidden",
         height: "100vh",
       }}
       hasSider
@@ -88,7 +87,17 @@ function App() {
         visible={createSphereModalVisible}
         setVisibility={setCreateSphereModalVisible}
       />
-      <Content id="mainCanvas">
+      <Content
+        id="mainCanvas"
+        style={{
+          boxSizing: "border-box",
+          margin: "auto",
+          display: "flex",
+          justifyContent: "center",
+          height: "100%",
+          alignItems: "center",
+        }}
+      >
         <P5Interface />
       </Content>
       <Sider

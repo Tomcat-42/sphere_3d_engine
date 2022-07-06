@@ -1,26 +1,25 @@
 import p5Types from "p5";
 import nj from "numjs";
-import { pipe } from "../utils/pipe";
 
 export type CameraConstructorType = {
-  position: number[];
+  camPosition: number[];
   lookingAt?: number[];
   p5: p5Types;
+  p?: number[];
+  screenDimensions: number[];
+  // projectionPlanDistance: number; TODO: Fazer isso com percentagem (igual na planilha)
 };
-
-// TGx = (25 + (30-25)/2) = 27.5
-// TGy = (1 + (10-1)/2) = 5.5
-// TGz = (22.5 + (25-22.5)/2) = 23.75
-// T(-27.5, -5.5, -23.75)
 
 export class Camera {
   private p5: p5Types;
 
-  private vrp: number[] = [];
-  private lookingAt: number[] = [];
+  public vrp: number[] = [];
+  public p: number[] = [0, 0, 0];
+
+  private screenDimensions: number[];
 
   // camera vectors
-  private nVector: number[] = [];
+  public nVector: number[] = [];
   private vVector: number[] = [];
   private uVector: number[] = [];
 
@@ -28,28 +27,40 @@ export class Camera {
   public projectionMatrix: number[][] = nj.zeros([4, 4]).tolist();
   public Mjp: number[][] = nj.zeros([4, 4]).tolist();
 
-  // public fovY: number = 90;
-  // public near: number = 0.5;
-  // public far: number = 100;
-
-  constructor({ position, lookingAt = [0, 0, 0], p5 }: CameraConstructorType) {
+  constructor({
+    camPosition,
+    p5,
+    p = [0, 0, 0],
+    screenDimensions,
+  }: CameraConstructorType) {
     this.p5 = p5;
 
-    this.generateCanonicalBase(position, lookingAt);
+    this.screenDimensions = [...screenDimensions];
+
+    this.generateCanonicalBase(camPosition, p);
   }
 
-  private generateCanonicalBase(position: number[], lookingAt: number[]) {
+  private generateCanonicalBase(camPosition: number[], p: number[]) {
     const p5 = this.p5;
 
-    this.vrp = position;
-    this.lookingAt = lookingAt;
-    this.nVector = this.defineNVector(this.vrp, lookingAt);
+    this.vrp = [...camPosition];
+    this.p = [...p];
+    this.nVector = this.defineNVector(this.vrp, this.p);
     this.vVector = this.defineVVector();
     this.uVector = this.defineUVector();
 
     this.setMsrusrc();
     this.setProjectionMatrix();
-    this.setMjp(0, p5.width, 0, p5.height, 0, p5.height, 0, p5.width);
+    this.setMjp(
+      -(this.screenDimensions[0] - 1) / 2, //por causa do 0 no centro da tela
+      (this.screenDimensions[0] - 1) / 2,
+      -(this.screenDimensions[1] - 1) / 2,
+      (this.screenDimensions[1] - 1) / 2,
+      -150, // TODO: permitir o usuário setar esse valor
+      150,
+      -300,
+      300
+    );
   }
 
   private defineNVector(vrp: number[], lookingAt: number[]): number[] {
@@ -84,6 +95,7 @@ export class Camera {
   private setMsrusrc(): number[][] {
     const p5 = this.p5;
     const negativeVrp = p5.createVector(...this.vrp).mult(-1);
+
     const Msrusrc = [
       [...this.uVector, negativeVrp.dot(p5.createVector(...this.uVector))],
       [...this.vVector, negativeVrp.dot(p5.createVector(...this.vVector))],
@@ -99,9 +111,7 @@ export class Camera {
   private setProjectionMatrix(): number[][] {
     const p5 = this.p5;
 
-    const dp = p5
-      .createVector(...this.vrp)
-      .dist(p5.createVector(...this.lookingAt));
+    const dp = p5.createVector(...this.vrp).dist(p5.createVector(...this.p));
     const zvp = -dp;
 
     const projectionMatrix = [
@@ -152,17 +162,15 @@ export class Camera {
     if (axis === "y") this.vrp[1] += ratio;
     if (axis === "z") this.vrp[2] += ratio;
 
-    this.generateCanonicalBase(this.vrp, this.lookingAt);
+    this.generateCanonicalBase(this.vrp, this.p);
   }
 
-  public updateLookingAt(x: number, y: number) {
-    console.debug("lookingAt: ", this.lookingAt);
+  public updateP(x: number, y: number, z: number) {
+    console.debug("p: ", this.p);
 
-    this.lookingAt[0] = this.lookingAt[0] + x;
-    this.lookingAt[1] = this.lookingAt[1] + y;
+    this.p[0] = this.p[0] + x;
+    this.p[1] = this.p[1] + y;
 
-    console.debug("newLookingAt: ", this.lookingAt);
-
-    this.generateCanonicalBase(this.vrp, this.lookingAt);
+    this.generateCanonicalBase(this.vrp, this.p);
   }
 }
