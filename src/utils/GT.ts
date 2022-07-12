@@ -9,21 +9,24 @@ export class GT {
   ): number[][] {
     const angleInRadians = degreesToRaians(angle);
     const zRot = nj.array([
-      [Math.cos(angleInRadians), -Math.sin(angleInRadians), 0],
-      [Math.sin(angleInRadians), Math.cos(angleInRadians), 0],
-      [0, 0, 1],
+      [Math.cos(angleInRadians), -Math.sin(angleInRadians), 0, 0],
+      [Math.sin(angleInRadians), Math.cos(angleInRadians), 0, 0],
+      [0, 0, 1, 0],
+      [0, 0, 0, 1],
     ]);
 
     const xRot = nj.array([
-      [1, 0, 0],
-      [0, Math.cos(angleInRadians), -Math.sin(angleInRadians)],
-      [0, Math.sin(angleInRadians), Math.cos(angleInRadians)],
+      [1, 0, 0, 0],
+      [0, Math.cos(angleInRadians), -Math.sin(angleInRadians), 0],
+      [0, Math.sin(angleInRadians), Math.cos(angleInRadians), 0],
+      [0, 0, 0, 1],
     ]);
 
     const yRot = nj.array([
-      [Math.cos(angleInRadians), 0, Math.sin(angleInRadians)],
-      [0, 1, 0],
-      [-Math.sin(angleInRadians), 0, Math.cos(angleInRadians)],
+      [Math.cos(angleInRadians), 0, Math.sin(angleInRadians), 0],
+      [0, 1, 0, 0],
+      [-Math.sin(angleInRadians), 0, Math.cos(angleInRadians), 0],
+      [0, 0, 0, 1],
     ]);
 
     if (axis === "x") {
@@ -55,11 +58,7 @@ export class GT {
       [0, 0, 0, 1],
     ]);
     return points.map((point) => {
-      point.push(1);
-      return nj
-        .dot(translationMatrix, nj.array<any>(point)) //make multiply
-        .tolist() // transform to list
-        .slice(0, 3); // return jusnt the first 3 values
+      return nj.dot(translationMatrix, nj.array<any>(point)).tolist();
     });
   }
 
@@ -71,11 +70,7 @@ export class GT {
       [0, 0, 0, 1],
     ]);
     return points.map((point) => {
-      point.push(1);
-      return nj
-        .dot(scaleMatrix, nj.array<any>(point)) //make multiply
-        .tolist() // transform to list
-        .slice(0, 3); // return jusnt the first 3 values
+      return nj.dot(scaleMatrix, nj.array<any>(point)).tolist();
     });
   }
 }

@@ -1,7 +1,7 @@
-import p5Types from "p5";
 import nj from "numjs";
-import { GT } from "../utils/GT";
+import p5Types from "p5";
 import { v4 } from "uuid";
+import { GT } from "../utils/GT";
 
 const moveCenter = (
   _: SphereType,
@@ -33,11 +33,12 @@ export type SphereType = {
   color: string;
   // meridiansBegin: number[]
   // meridiansEnd: number[]
-  // vertices: number[][][]
-  // faces: []
+  vertices: number[][][];
+  faces: number[][][];
   updateData: (data: UpdateSphereType) => void;
   drawVertices: (p5: p5Types) => void;
   drawEdges: (p5: p5Types) => void;
+  drawFaces: (p5: p5Types) => void;
   translate: (dx: number, dy: number, dz: number) => void;
   scale: (sx: number, sy: number, sz: number) => void;
   rotate: (angle: number, axis: string) => void;
@@ -63,15 +64,16 @@ type UpdateSphereType = {
 export class Sphere {
   public meridiansAmout: number;
   public parallelsAmount: number;
-  radius: number;
-  center: number[];
+  public radius: number;
+  public center: number[];
   readonly id: string;
   public name: string;
   public color: string;
+  public vertices: number[][][];
+  public faces: number[][][] = [];
+
   private meridiansBegin: number[];
   private meridiansEnd: number[];
-  private vertices: number[][][];
-  // private faces: []
 
   constructor({
     meridians,
@@ -84,41 +86,37 @@ export class Sphere {
     this.meridiansAmout = meridians;
     this.parallelsAmount = parallels;
     this.radius = radius;
-    this.center = center;
+    this.center = [...center, 1];
     this.name = name;
     this.id = v4();
     this.color = color;
 
     this.meridiansBegin = nj
-      .add(nj.array(center), nj.array([0.0, -radius, 0.0]))
+      .add(nj.array(this.center), nj.array([0.0, -radius, 0.0, 1]))
       .tolist();
 
     this.meridiansEnd = nj
-      .add(nj.array(center), nj.array([0.0, radius, 0.0]))
+      .add(nj.array(this.center), nj.array([0.0, radius, 0.0, 1]))
       .tolist();
 
     // create matrix of vertices
     this.vertices = nj
-      .zeros(this.meridiansAmout * this.parallelsAmount * 3)
-      .reshape(this.parallelsAmount, this.meridiansAmout, 3)
+      .zeros(this.meridiansAmout * (this.parallelsAmount + 2) * 3)
+      .reshape(this.parallelsAmount + 2, this.meridiansAmout, 3)
       .tolist();
 
-    // create matrix of indices for faces
-    // this.faces = []
-    this.center = center;
-
     this.defineVertices();
-    // this.defineFaces()
+    this.defineFaces();
   }
 
   private defineVertices() {
     const angleMeridians = 360 / this.meridiansAmout;
     const angleParallels = 180 / (this.parallelsAmount + 1);
 
-    for (let i = 0; i < this.parallelsAmount; i++) {
+    for (let i = 0; i < this.parallelsAmount + 2; i++) {
       this.vertices[i][0] = GT.rotate(
-        -(angleParallels * (i + 1)),
-        [[0, this.radius, 0]],
+        -(angleParallels * i),
+        [[0, -this.radius, 0, 0]],
         "z"
       )[0];
 
@@ -133,6 +131,7 @@ export class Sphere {
                     this.vertices[i][0][0],
                     this.vertices[i][0][1],
                     this.vertices[i][0][2],
+                    0,
                   ],
                 ],
                 "y"
@@ -147,6 +146,39 @@ export class Sphere {
         .add(nj.array(this.vertices[i][0]), nj.array(this.center))
         .tolist();
     }
+  }
+
+  private defineFaces() {
+    const faces: number[][][] = [];
+
+    for (let i = 0; i < this.vertices.length - 1; i++) {
+      for (let j = 0; j < this.vertices[i].length; j++) {
+        if (i === 0) {
+          faces.push([
+            [i, j],
+            [i + 1, j],
+            [i + 1, (j + 1) % this.meridiansAmout],
+          ]);
+          continue;
+        } else if (i === this.vertices.length - 2) {
+          faces.push([
+            [i, j],
+            [i + 1, j],
+            [i, (j + 1) % this.meridiansAmout],
+          ]);
+          continue;
+        }
+        const face = [
+          [i, j],
+          [i + 1, j],
+          [i + 1, (j + 1) % this.meridiansAmout],
+          [i, (j + 1) % this.meridiansAmout],
+        ];
+        faces.push(face);
+      }
+    }
+
+    this.faces = faces;
   }
 
   public drawVertices(p5: p5Types) {
@@ -165,6 +197,29 @@ export class Sphere {
       this.meridiansBegin[1],
       this.meridiansBegin[2]
     );
+    p5.pop();
+  }
+
+  public drawFaces(p5: p5Types) {
+    p5.push();
+
+    p5.noStroke();
+    p5.stroke("black");
+    p5.strokeWeight(1);
+    p5.fill(this.color);
+
+    this.faces.forEach((face: number[][]) => {
+      p5.beginShape();
+      face.forEach((vertexIdx: number[]) => {
+        p5.vertex(
+          this.vertices[vertexIdx[0]][vertexIdx[1]][0],
+          this.vertices[vertexIdx[0]][vertexIdx[1]][1],
+          this.vertices[vertexIdx[0]][vertexIdx[1]][2]
+        );
+      });
+      p5.endShape(p5.CLOSE);
+    });
+
     p5.pop();
   }
 
@@ -226,7 +281,7 @@ export class Sphere {
     const flatVertices = GT.translate(this.vertices.flat(), dx, dy, dz);
     this.vertices = nj
       .array(flatVertices)
-      .reshape(this.parallelsAmount, this.meridiansAmout, 3)
+      .reshape(this.parallelsAmount + 2, this.meridiansAmout, 4)
       .tolist();
   }
 
@@ -246,7 +301,7 @@ export class Sphere {
     const flatVertices = GT.scale(this.vertices.flat(), sx, sy, sz);
     this.vertices = nj
       .array(flatVertices)
-      .reshape(this.parallelsAmount, this.meridiansAmout, 3)
+      .reshape(this.parallelsAmount + 2, this.meridiansAmout, 4)
       .tolist();
   }
 
@@ -265,7 +320,7 @@ export class Sphere {
     const flatVertices = GT.rotate(angle, this.vertices.flat(), axis);
     this.vertices = nj
       .array(flatVertices)
-      .reshape(this.parallelsAmount, this.meridiansAmout, 3)
+      .reshape(this.parallelsAmount + 2, this.meridiansAmout, 4)
       .tolist();
   }
 
@@ -282,95 +337,19 @@ export class Sphere {
     this.name = name || this.name;
     this.color = color || this.color;
 
-    this.meridiansBegin = [
-      this.center[0],
-      this.center[1] - this.radius,
-      this.center[2],
-    ];
+    this.meridiansBegin = nj
+      .add(nj.array(this.center), nj.array([0.0, -this.radius, 0.0, 1]))
+      .tolist();
 
-    this.meridiansEnd = [
-      this.center[0],
-      this.center[1] + this.radius,
-      this.center[2],
-    ];
+    this.meridiansEnd = nj
+      .add(nj.array(this.center), nj.array([0.0, this.radius, 0.0, 1]))
+      .tolist();
 
     this.vertices = nj
-      .zeros(this.meridiansAmout * this.parallelsAmount * 3)
-      .reshape(this.parallelsAmount, this.meridiansAmout, 3)
+      .zeros(this.meridiansAmout * (this.parallelsAmount + 2) * 3)
+      .reshape(this.parallelsAmount + 2, this.meridiansAmout, 3)
       .tolist();
 
     this.defineVertices();
   }
 }
-
-// class Sphere:
-//     def __init__(self, meridians, parallels, radius, center=np.array([0.0, 0.0, 0.0])):
-//         self.meridians_amout = meridians
-//         self.parallels_amount = parallels
-//         self.radius = radius
-//         self.meridians_begin = center + np.array([0.0, radius, 0.0])
-//         self.meridians_end = center + np.array([0.0, -radius, 0.0])
-//
-//         # create matrix of vertices
-//         self.vertices = np.zeros(
-//             self.meridians_amout * self.parallels_amount * 3
-//         ).reshape(self.parallels_amount, self.meridians_amout, 3)
-//
-//         # create matrix of indices for faces
-//         self.faces = [
-//             [[] for y in range(self.meridians_amout)]
-//             for x in range(self.parallels_amount + 1)
-//         ]
-//         self.center = center
-//
-//         self.define_vertices()
-//         self.define_faces()
-//
-//     def define_vertices(self):
-//         angle_meridians = 360 / self.meridians_amout
-//         angle_parallels = 180 / (self.parallels_amount + 1)
-//
-//         for i in range(self.parallels_amount):
-//             self.vertices[i][0] = rotate_point(
-//                 -(angle_parallels * (i + 1)), 0, self.radius, 0, "z"
-//             )
-//             for j in range(1, self.meridians_amout):
-//                 self.vertices[i][j] = (
-//                     rotate_point(
-//                         -(angle_meridians * j),
-//                         self.vertices[i][0][0],
-//                         self.vertices[i][0][1],
-//                         self.vertices[i][0][2],
-//                         "y",
-//                     )
-//                     + self.center
-//                 )
-//
-//             # add center after because the original point is used to define the parallels
-//             self.vertices[i - 1][0] = self.vertices[i - 1][0] + self.center
-//
-//     def define_faces(self):
-//         # make all the triangular faces
-//         for i in range(2):
-//             for j in range(self.meridians_amout):
-//                 face_vertices = []
-//                 face_vertices.append({"i": i * (self.parallels_amount - 1), "j": j})
-//                 face_vertices.append(
-//                     {
-//                         "i": i * (self.parallels_amount - 1),
-//                         "j": (j + 1) % self.meridians_amout,
-//                     }
-//                 )
-//                 self.faces[i * self.parallels_amount][j] = face_vertices
-//
-//         # make all the quad faces
-//         for i in range(self.parallels_amount - 1):
-//             for j in range(self.meridians_amout):
-//                 face_vertices = []
-//                 face_vertices.append({"i": i, "j": j})
-//                 face_vertices.append({"i": i, "j": (j + 1) % self.meridians_amout})
-//                 face_vertices.append({"i": i + 1, "j": j})
-//                 face_vertices.append({"i": i + 1, "j": (j + 1) % self.meridians_amout})
-//                 # print("face_vertices[", i, "][", j, "]: ", face_vertices)
-//                 self.faces[i + 1][j] = face_vertices
-//

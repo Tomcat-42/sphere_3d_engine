@@ -1,12 +1,19 @@
-import p5Types from "p5";
 import nj from "numjs";
+import p5Types from "p5";
+
+export type WindowType = {
+  width: number[];
+  height: number[];
+};
 
 export type CameraConstructorType = {
   camPosition: number[];
-  lookingAt?: number[];
   p5: p5Types;
   p?: number[];
   screenDimensions: number[];
+  window: WindowType;
+  near: number;
+  far: number;
   // projectionPlanDistance: number; TODO: Fazer isso com percentagem (igual na planilha)
 };
 
@@ -27,13 +34,23 @@ export class Camera {
   public projectionMatrix: number[][] = nj.zeros([4, 4]).tolist();
   public Mjp: number[][] = nj.zeros([4, 4]).tolist();
 
+  public window: WindowType = {} as WindowType;
+  public near: number;
+  public far: number;
+
   constructor({
     camPosition,
     p5,
     p = [0, 0, 0],
     screenDimensions,
+    window,
+    near,
+    far,
   }: CameraConstructorType) {
     this.p5 = p5;
+    this.window = JSON.parse(JSON.stringify(window));
+    this.near = near;
+    this.far = far;
 
     this.screenDimensions = [...screenDimensions];
 
@@ -41,8 +58,6 @@ export class Camera {
   }
 
   private generateCanonicalBase(camPosition: number[], p: number[]) {
-    const p5 = this.p5;
-
     this.vrp = [...camPosition];
     this.p = [...p];
     this.nVector = this.defineNVector(this.vrp, this.p);
@@ -56,10 +71,10 @@ export class Camera {
       (this.screenDimensions[0] - 1) / 2,
       -(this.screenDimensions[1] - 1) / 2,
       (this.screenDimensions[1] - 1) / 2,
-      -150, // TODO: permitir o usuário setar esse valor
-      150,
-      -300,
-      300
+      this.window.height[0],
+      this.window.height[1],
+      this.window.width[0],
+      this.window.width[1]
     );
   }
 
@@ -163,6 +178,29 @@ export class Camera {
     if (axis === "z") this.vrp[2] += ratio;
 
     this.generateCanonicalBase(this.vrp, this.p);
+  }
+
+  public setVrp(vrp: number[]) {
+    this.vrp = [...vrp];
+    this.generateCanonicalBase(this.vrp, this.p);
+  }
+
+  public setP(p: number[]) {
+    this.p = [...p];
+    this.generateCanonicalBase(this.vrp, this.p);
+  }
+
+  public setWindow(window: WindowType) {
+    this.window = JSON.parse(JSON.stringify(window));
+    this.generateCanonicalBase(this.vrp, this.p);
+  }
+
+  public setNear(near: number) {
+    this.near = near;
+  }
+
+  public setFar(far: number) {
+    this.far = far;
   }
 
   public updateP(x: number, y: number, z: number) {

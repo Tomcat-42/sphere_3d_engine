@@ -3,15 +3,10 @@ import p5Types from "p5";
 import { Camera } from "../objects/Camera";
 import { normalCalc } from "./normalCalc";
 
-export enum projectioType {
-  isometric = "isometric",
-  dimetric = "dimetric",
-  trimetric = "trimetric",
-}
-
 export const drawAxonometricFace = (
   p5: p5Types,
   face: number[][],
+  color: string,
   camera: Camera
 ) => {
   const localFace: number[][] = JSON.parse(JSON.stringify(face));
@@ -22,7 +17,10 @@ export const drawAxonometricFace = (
 
   if (angle < 0.00000001) return;
 
-  const concatenedPipeMatrices = math.matrix(camera.Msrusrc);
+  const concatenedPipeMatrices = math.multiply(
+    math.matrix(camera.Mjp),
+    math.matrix(camera.Msrusrc)
+  );
 
   const pointsMatrix = math.multiply(
     concatenedPipeMatrices,
@@ -30,11 +28,13 @@ export const drawAxonometricFace = (
   );
 
   p5.push();
+  p5.fill(color);
   p5.beginShape();
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < pointsMatrix.size()[1]; i++) {
     const yes = math.subset(pointsMatrix, math.index(math.range(0, 3), i));
     p5.vertex(yes.get([0, 0]), yes.get([1, 0]), 0);
   }
   p5.endShape(p5.CLOSE);
+  p5.noFill();
   p5.pop();
 };

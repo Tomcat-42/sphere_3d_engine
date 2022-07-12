@@ -1,12 +1,13 @@
-import { normalCalc } from "./normalCalc";
+import * as math from "mathjs";
 import p5Types from "p5";
 import { Camera } from "../objects/Camera";
+import { normalCalc } from "./normalCalc";
 import { pipe } from "./pipe";
-import * as math from "mathjs";
 
 export const drawPerspectiveFace = (
   camera: Camera,
   face: number[][],
+  color: string,
   p5: p5Types
 ) => {
   const localFace = JSON.parse(JSON.stringify(face));
@@ -19,13 +20,15 @@ export const drawPerspectiveFace = (
   const points = pipe(camera, localFace);
 
   p5.push();
+  p5.fill(color);
   p5.beginShape();
 
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < points.size()[1]; i++) {
     const yes = math.subset(points, math.index(math.range(0, 3), i));
     p5.vertex(yes.get([0, 0]), yes.get([1, 0]), yes.get([2, 0]));
   }
 
   p5.endShape(p5.CLOSE);
+  p5.noFill();
   p5.pop();
 };
