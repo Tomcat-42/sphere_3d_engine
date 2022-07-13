@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useContext, useState } from "react";
 import { Camera, WindowType } from "../objects/Camera";
+import { Light } from "../objects/Light";
 import { SphereType } from "../objects/Sphere";
 
 enum drawModeEnum {
@@ -36,6 +37,18 @@ type SceneContextType = {
     [drawModeEnum.perspective]: { value: drawModeEnum; label: string };
     [drawModeEnum.axonometric]: { value: drawModeEnum; label: string };
   };
+  light: Light;
+  setLight: (light: Light) => void;
+  lightPosition: number[];
+  setLightPosition: (position: number[]) => void;
+  ambientLightIntensity: number[];
+  setAmbientLightIntensity: (intensity: number[]) => void;
+  lightIntensity: number[];
+  setLightIntensity: (intensity: number[]) => void;
+  axisToRotate: "x" | "y" | "z";
+  setAxisToRotate: (axis: "x" | "y" | "z") => void;
+  isToRotateLight: boolean;
+  setIsToRotateLight: (isToRotateLight: boolean) => void;
 };
 
 export const SceneContext = createContext({} as SceneContextType);
@@ -67,6 +80,34 @@ export const SceneContextProvider = ({ children }: { children: ReactNode }) => {
       value: drawModeEnum.axonometric,
       label: "Axonometric",
     },
+  };
+
+  const [light, setLight] = useState<Light>({} as Light);
+  const [lightPosition, setLocalLightPosition] = useState<number[]>([
+    -80, 0, 0, 1,
+  ]);
+  const [ambientLightIntensity, setLocalAmbientLightIntensity] = useState<
+    number[]
+  >([255, 255, 255]);
+  const [lightIntensity, setLocalLightIntensity] = useState<number[]>([
+    255, 255, 255,
+  ]);
+  const [axisToRotate, setAxisToRotate] = useState<"x" | "y" | "z">("y");
+  const [isToRotateLight, setIsToRotateLight] = useState<boolean>(false);
+
+  const setLightPosition = (newPosition: number[]) => {
+    setLocalLightPosition(newPosition);
+    light.setPosition(newPosition);
+  };
+
+  const setAmbientLightIntensity = (newIntensity: number[]) => {
+    setLocalAmbientLightIntensity(newIntensity);
+    light.setAmbientLightIntensity(newIntensity);
+  };
+
+  const setLightIntensity = (newIntensity: number[]) => {
+    setLocalLightIntensity(newIntensity);
+    light.setLightIntensity(newIntensity);
   };
 
   const setCamP = (position: number[]) => {
@@ -150,6 +191,18 @@ export const SceneContextProvider = ({ children }: { children: ReactNode }) => {
         camFar,
         setCamFar,
         projectionType,
+        light,
+        setLight,
+        lightPosition,
+        setLightPosition,
+        ambientLightIntensity,
+        setAmbientLightIntensity,
+        lightIntensity,
+        setLightIntensity,
+        axisToRotate,
+        setAxisToRotate,
+        isToRotateLight,
+        setIsToRotateLight,
       }}
     >
       {children}

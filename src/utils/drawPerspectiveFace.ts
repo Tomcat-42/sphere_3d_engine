@@ -7,7 +7,8 @@ import { pipe } from "./pipe";
 export const drawPerspectiveFace = (
   camera: Camera,
   face: number[][],
-  color: string,
+  color: number[],
+  selected: boolean,
   p5: p5Types
 ) => {
   const localFace = JSON.parse(JSON.stringify(face));
@@ -20,7 +21,12 @@ export const drawPerspectiveFace = (
   const points = pipe(camera, localFace);
 
   p5.push();
-  p5.fill(color);
+  if (selected) {
+    p5.stroke("yellow");
+    p5.strokeWeight(1);
+  } else p5.strokeWeight(0);
+  
+  p5.fill(color[0], color[1], color[2]);
   p5.beginShape();
 
   for (let i = 0; i < points.size()[1]; i++) {

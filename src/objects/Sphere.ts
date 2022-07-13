@@ -31,8 +31,9 @@ export type SphereType = {
   readonly id: string;
   name: string;
   color: string;
-  // meridiansBegin: number[]
-  // meridiansEnd: number[]
+  Ka: number[];
+  Kd: number[];
+  Ks: number[];
   vertices: number[][][];
   faces: number[][][];
   updateData: (data: UpdateSphereType) => void;
@@ -51,6 +52,9 @@ export type SphereConstructorType = {
   center: number[];
   name: string;
   color: string;
+  Ka: number[];
+  Kd: number[];
+  Ks: number[];
 };
 
 type UpdateSphereType = {
@@ -59,6 +63,9 @@ type UpdateSphereType = {
   radius?: number;
   name?: string;
   color?: string;
+  Ka?: number[];
+  Kd?: number[];
+  Ks?: number[];
 };
 
 export class Sphere {
@@ -75,6 +82,10 @@ export class Sphere {
   private meridiansBegin: number[];
   private meridiansEnd: number[];
 
+  public Ka: number[];
+  public Kd: number[];
+  public Ks: number[];
+
   constructor({
     meridians,
     parallels,
@@ -82,7 +93,13 @@ export class Sphere {
     name,
     color,
     center = [0, 0, 0],
+    Ka,
+    Kd,
+    Ks,
   }: SphereConstructorType) {
+    this.Ka = [...Ka];
+    this.Kd = [...Kd];
+    this.Ks = [...Ks];
     this.meridiansAmout = meridians;
     this.parallelsAmount = parallels;
     this.radius = radius;
@@ -330,12 +347,25 @@ export class Sphere {
     meridians,
     name,
     color,
+    Ka,
+    Kd,
+    Ks,
   }: UpdateSphereType) {
+    const isToReDraw =
+      radius !== this.radius ||
+      parallels !== this.parallelsAmount ||
+      meridians !== this.meridiansAmout;
+
     this.radius = radius || this.radius;
     this.parallelsAmount = parallels || this.parallelsAmount;
     this.meridiansAmout = meridians || this.meridiansAmout;
     this.name = name || this.name;
     this.color = color || this.color;
+    this.Ka = Ka || this.Ka;
+    this.Kd = Kd || this.Kd;
+    this.Ks = Ks || this.Ks;
+
+    if (!isToReDraw) return;
 
     this.meridiansBegin = nj
       .add(nj.array(this.center), nj.array([0.0, -this.radius, 0.0, 1]))
@@ -351,5 +381,6 @@ export class Sphere {
       .tolist();
 
     this.defineVertices();
+    this.defineFaces();
   }
 }

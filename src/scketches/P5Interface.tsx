@@ -3,9 +3,13 @@ import Sketch from "react-p5";
 import { DirectionEnum } from "../constants";
 import { useSceneContext } from "../contexts/Scene";
 import { Camera } from "../objects/Camera";
+import { Light } from "../objects/Light";
 import { drawAxonometricFace } from "../utils/drawAxonometricFace";
 import { drawPerspectiveFace } from "../utils/drawPerspectiveFace";
 import { generateCube } from "../utils/generateSquare";
+import { GT } from "../utils/GT";
+import { degreesToRaians } from "../utils/math";
+import { pipe } from "../utils/pipe";
 
 export const P5Interface = () => {
   const {
@@ -21,6 +25,13 @@ export const P5Interface = () => {
     windowSize,
     camNear,
     camFar,
+    light,
+    setLight,
+    lightPosition,
+    ambientLightIntensity,
+    lightIntensity,
+    axisToRotate,
+    isToRotateLight,
   } = useSceneContext();
   let canvasSize: number[] = [
     document.getElementById("mainCanvas")?.clientWidth || 0,
@@ -28,6 +39,7 @@ export const P5Interface = () => {
   ];
   // let shader: p5Types.Shader;
 
+  // FIXME: Change Camera parameters of viewport
   const windowResized = (p5: p5Types) => {
     const element = document.getElementById("mainCanvas");
     const size = [
@@ -71,6 +83,13 @@ export const P5Interface = () => {
         far: camFar,
       })
     );
+    setLight(
+      new Light({
+        position: lightPosition,
+        Ila: ambientLightIntensity,
+        Il: lightIntensity,
+      })
+    );
 
     p5.createCanvas(initialSize[0], initialSize[1], p5.WEBGL).parent(
       "mainCanvas"
@@ -101,6 +120,16 @@ export const P5Interface = () => {
 
     if (p5.keyIsPressed) moveCamera(myCamera, p5.keyCode);
 
+    p5.push();
+    if (isToRotateLight)
+      light.setPosition(GT.rotate(1, [[...light.position]], axisToRotate)[0]);
+    const yes = pipe(myCamera, [[...light.position]]);
+    p5.stroke(light.Il[0], light.Il[1], light.Il[2]);
+    p5.translate(yes.get([0, 0]), yes.get([1, 0]), yes.get([2, 0]));
+    p5.sphere(5);
+    p5.noFill();
+    p5.pop();
+
     sceneObjects.forEach((sphere) => {
       const distance = p5
         .createVector(...sphere.center)
@@ -114,10 +143,12 @@ export const P5Interface = () => {
         sphereFace.forEach((vertexIdx: number[]) =>
           face.push(sphere.vertices[vertexIdx[0]][vertexIdx[1]])
         );
-
+        const color = light.getFaceColor(face, sphere.Ka, sphere.Kd, p5);
+        // console.debug(color);
+        const isSelected = selectedSphereId === sphere.id;
         if (drawMode === drawModeEnum.perspective)
-          drawPerspectiveFace(myCamera, face, sphere.color, p5);
-        else drawAxonometricFace(p5, face, sphere.color, myCamera);
+          drawPerspectiveFace(myCamera, face, color, isSelected, p5);
+        else drawAxonometricFace(p5, face, color, isSelected, myCamera);
       });
     });
 

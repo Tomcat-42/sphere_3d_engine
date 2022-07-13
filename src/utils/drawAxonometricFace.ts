@@ -6,7 +6,8 @@ import { normalCalc } from "./normalCalc";
 export const drawAxonometricFace = (
   p5: p5Types,
   face: number[][],
-  color: string,
+  color: number[],
+  selected: boolean,
   camera: Camera
 ) => {
   const localFace: number[][] = JSON.parse(JSON.stringify(face));
@@ -28,7 +29,14 @@ export const drawAxonometricFace = (
   );
 
   p5.push();
-  p5.fill(color);
+  if (selected) {
+    p5.stroke("yellow");
+    p5.strokeWeight(3);
+  } else {
+    p5.stroke("black");
+    p5.strokeWeight(1);
+  }
+  p5.fill(color[0], color[1], color[2]);
   p5.beginShape();
   for (let i = 0; i < pointsMatrix.size()[1]; i++) {
     const yes = math.subset(pointsMatrix, math.index(math.range(0, 3), i));

@@ -2,13 +2,13 @@ import { ClearOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Collapse, Layout, Row, Tabs, Tooltip, Typography } from "antd";
 import { useState } from "react";
 import { CameraTab } from "./components/CameraTab";
+import { LightTab } from "./components/LightTab";
 import { CreateSphereModal } from "./components/SphereModal";
 import { SphereTab } from "./components/SphereTab";
 import { useSceneContext } from "./contexts/Scene";
 import { SphereType } from "./objects/Sphere";
 import { P5Interface } from "./scketches/P5Interface";
 const { Sider, Content } = Layout;
-const { Panel } = Collapse;
 const { TabPane } = Tabs;
 
 function App() {
@@ -61,7 +61,7 @@ function App() {
         <Typography.Title level={2} style={{ textAlign: "center" }}>
           Sphere Generator
         </Typography.Title>
-        <Tabs>
+        <Tabs style={{ color: "white" }}>
           <TabPane tab="Spheres" key="1">
             <SphereTab
               setDefaultSphere={setDefaultSphere}
@@ -73,12 +73,8 @@ function App() {
             <CameraTab />
           </TabPane>
 
-          <TabPane tab="Light" key="3">
-            <Collapse bordered={false}>
-              <Panel key={1} showArrow={false} header="Light">
-                <label>Light Params Here</label>
-              </Panel>
-            </Collapse>
+          <TabPane style={{ color: "white" }} tab="Light" key="3">
+            <LightTab />
           </TabPane>
         </Tabs>
 

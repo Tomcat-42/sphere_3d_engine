@@ -52,6 +52,7 @@ const NearAndFar = () => {
           <label>Near</label>
           <InputNumber
             value={camNear}
+            controls={false}
             defaultValue={camNear}
             onChange={(value) => setCamNear(value)}
             style={{
@@ -62,6 +63,7 @@ const NearAndFar = () => {
         <Col span={12}>
           <label>Far</label>
           <InputNumber
+            controls={false}
             value={camFar}
             defaultValue={camFar}
             onChange={(value) => setCamFar(value)}
@@ -88,6 +90,7 @@ const WindowSize = () => {
           <label>X Min</label>
           <InputNumber
             value={windowSize.width[0]}
+            controls={false}
             defaultValue={windowSize.width[0] || 0}
             onChange={(value) =>
               setWindowSize({
@@ -104,6 +107,7 @@ const WindowSize = () => {
           <label>X Max</label>
           <InputNumber
             value={windowSize.width[1]}
+            controls={false}
             defaultValue={windowSize.width[1] || 0}
             onChange={(value) =>
               setWindowSize({
@@ -122,6 +126,7 @@ const WindowSize = () => {
           <label>Y Min</label>
           <InputNumber
             value={windowSize.height[0]}
+            controls={false}
             defaultValue={windowSize.height[0] || 0}
             onChange={(value) =>
               setWindowSize({
@@ -137,6 +142,7 @@ const WindowSize = () => {
         <Col span={12}>
           <label>Y Max</label>
           <InputNumber
+            controls={false}
             value={windowSize.height[1]}
             defaultValue={windowSize.height[1] || 0}
             onChange={(value) =>
@@ -167,6 +173,7 @@ const CameraP = () => {
         <Col span={8}>
           <label>X</label>
           <InputNumber
+            controls={false}
             value={camP[0]}
             defaultValue={camP[0] || 0}
             onChange={(value) => setCamP([value, camP[1], camP[2]])}
@@ -178,6 +185,7 @@ const CameraP = () => {
         <Col span={8}>
           <label>Y</label>
           <InputNumber
+            controls={false}
             value={camP[1]}
             defaultValue={camP[1] || 0}
             onChange={(value) => setCamP([camP[0], value, camP[2]])}
@@ -189,6 +197,7 @@ const CameraP = () => {
         <Col span={8}>
           <label>Z</label>
           <InputNumber
+            controls={false}
             value={camP[2]}
             defaultValue={camP[2] || 0}
             onChange={(value) => setCamP([camP[0], camP[2], value])}
@@ -214,6 +223,7 @@ const CameraVrp = () => {
         <Col span={8}>
           <label>X</label>
           <InputNumber
+            controls={false}
             value={cameraVrpInterface[0]}
             defaultValue={cameraVrpInterface[0] || 0}
             onChange={(value) =>
@@ -227,6 +237,7 @@ const CameraVrp = () => {
         <Col span={8}>
           <label>Y</label>
           <InputNumber
+            controls={false}
             value={cameraVrpInterface[1]}
             defaultValue={cameraVrpInterface[1] || 0}
             onChange={(value) =>
@@ -240,6 +251,7 @@ const CameraVrp = () => {
         <Col span={8}>
           <label>Z</label>
           <InputNumber
+            controls={false}
             value={cameraVrpInterface[2]}
             defaultValue={cameraVrpInterface[2] || 0}
             onChange={(value) =>

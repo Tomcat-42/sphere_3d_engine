@@ -158,7 +158,7 @@ export const SphereTab: FC<SphereTabProps> = ({
             <>
               <label>X Scale</label>
               <InputNumber
-                defaultValue={0}
+                defaultValue={1}
                 onChange={(value) => setScaleX(value || 1)}
                 style={{
                   width: "100%",

@@ -17,10 +17,15 @@ export const CreateSphereModal = ({
 
   const formatFormData = (data: any) => {
     const sphereData: any = {} as SphereConstructorType;
+    sphereData["Ka"] = [];
+    sphereData["Kd"] = [];
+    sphereData["Ks"] = [];
     const sphereCenter: number[] = [];
 
     Object.keys(data).forEach((key: string) => {
       if (key.startsWith("center")) sphereCenter.push(data[key]);
+      if (key.startsWith("K"))
+        sphereData[key.split("").splice(0, 2).join("")].push(data[key]);
       else sphereData[key as keyof typeof sphereData] = data[key];
     });
     sphereData["center"] = sphereCenter;
@@ -40,6 +45,8 @@ export const CreateSphereModal = ({
   const handleEditSphere = (values: any) => {
     const sphereData = formatFormData(values);
     defaultSphere?.updateData(sphereData);
+    setVisibility(false);
+    form.resetFields();
   };
 
   return (
@@ -93,44 +100,201 @@ export const CreateSphereModal = ({
             </Form.Item>
           </Col>
         </Row>
-        {!isToEditSphere && (
-          <Row gutter={16} align="middle">
-            <Typography>Center: &nbsp;</Typography>(
-            <Col span={7}>
-              <Form.Item
-                name="centerX"
-                label="x"
-                rules={[{ required: true }]}
-                initialValue={isToEditSphere ? defaultSphere?.center[0] : 0}
-              >
-                <InputNumber style={{ width: "100%" }} controls={false} />
-              </Form.Item>
-            </Col>
-            <Col span={7}>
-              <Form.Item
-                name="centerY"
-                label="y"
-                rules={[{ required: true }]}
-                initialValue={isToEditSphere ? defaultSphere?.center[1] : -50}
-              >
-                <InputNumber style={{ width: "100%" }} controls={false} />
-              </Form.Item>
-            </Col>
-            <Col span={7}>
-              <Form.Item
-                name="centerZ"
-                label="z"
-                rules={[{ required: true }]}
-                initialValue={isToEditSphere ? defaultSphere?.center[2] : 0}
-              >
-                <InputNumber style={{ width: "100%" }} controls={false} />
-              </Form.Item>
-            </Col>
-            )
-          </Row>
-        )}
+        <Row gutter={16} align="middle">
+          Center: &nbsp; (
+          <Col span={6}>
+            <Form.Item
+              name="centerX"
+              label="x"
+              rules={[{ required: true }]}
+              initialValue={isToEditSphere ? defaultSphere?.center[0] : 0}
+            >
+              <InputNumber
+                disabled={isToEditSphere}
+                style={{ width: "100%" }}
+                controls={false}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={7}>
+            <Form.Item
+              name="centerY"
+              label="y"
+              rules={[{ required: true }]}
+              initialValue={isToEditSphere ? defaultSphere?.center[1] : 0}
+            >
+              <InputNumber
+                disabled={isToEditSphere}
+                style={{ width: "100%" }}
+                controls={false}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={7}>
+            <Form.Item
+              name="centerZ"
+              label="z"
+              rules={[{ required: true }]}
+              initialValue={isToEditSphere ? defaultSphere?.center[2] : -100}
+            >
+              <InputNumber
+                disabled={isToEditSphere}
+                style={{ width: "100%" }}
+                controls={false}
+              />
+            </Form.Item>
+          </Col>
+          )
+        </Row>
+        <Row gutter={16} align="middle">
+          Ka: &nbsp; (
+          <Col span={7}>
+            <Form.Item
+              name="KaR"
+              label="R"
+              rules={[{ required: true }]}
+              initialValue={isToEditSphere ? defaultSphere?.Ka[0] : 0.1}
+            >
+              <InputNumber
+                min={0}
+                max={1}
+                style={{ width: "100%" }}
+                controls={false}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={7}>
+            <Form.Item
+              name="KaG"
+              label="G"
+              rules={[{ required: true }]}
+              initialValue={isToEditSphere ? defaultSphere?.Ka[1] : 0.1}
+            >
+              <InputNumber
+                min={0}
+                max={1}
+                style={{ width: "100%" }}
+                controls={false}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={7}>
+            <Form.Item
+              name="KaB"
+              label="B"
+              rules={[{ required: true }]}
+              initialValue={isToEditSphere ? defaultSphere?.Ka[2] : 0.1}
+            >
+              <InputNumber
+                min={0}
+                max={1}
+                style={{ width: "100%" }}
+                controls={false}
+              />
+            </Form.Item>
+          </Col>
+          )
+        </Row>
+        <Row gutter={16} align="middle">
+          Kd: &nbsp; (
+          <Col span={7}>
+            <Form.Item
+              name="KdR"
+              label="R"
+              rules={[{ required: true }]}
+              initialValue={isToEditSphere ? defaultSphere?.Kd[0] : 0.3}
+            >
+              <InputNumber
+                min={0}
+                max={1}
+                style={{ width: "100%" }}
+                controls={false}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={7}>
+            <Form.Item
+              name="KdG"
+              label="G"
+              rules={[{ required: true }]}
+              initialValue={isToEditSphere ? defaultSphere?.Kd[1] : 0.3}
+            >
+              <InputNumber
+                min={0}
+                max={1}
+                style={{ width: "100%" }}
+                controls={false}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={7}>
+            <Form.Item
+              name="KdB"
+              label="B"
+              rules={[{ required: true }]}
+              initialValue={isToEditSphere ? defaultSphere?.Kd[2] : 0.3}
+            >
+              <InputNumber
+                min={0}
+                max={1}
+                style={{ width: "100%" }}
+                controls={false}
+              />
+            </Form.Item>
+          </Col>
+          )
+        </Row>
+        <Row gutter={16} align="middle">
+          Ks: &nbsp; (
+          <Col span={7}>
+            <Form.Item
+              name="KsR"
+              label="R"
+              rules={[{ required: true }]}
+              initialValue={isToEditSphere ? defaultSphere?.Ks[0] : 0}
+            >
+              <InputNumber
+                min={0}
+                max={1}
+                style={{ width: "100%" }}
+                controls={false}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={7}>
+            <Form.Item
+              name="KsG"
+              label="G"
+              rules={[{ required: true }]}
+              initialValue={isToEditSphere ? defaultSphere?.Ks[1] : 0}
+            >
+              <InputNumber
+                min={0}
+                max={1}
+                style={{ width: "100%" }}
+                controls={false}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={7}>
+            <Form.Item
+              name="KsB"
+              label="B"
+              rules={[{ required: true }]}
+              initialValue={isToEditSphere ? defaultSphere?.Ks[2] : 0}
+            >
+              <InputNumber
+                min={0}
+                max={1}
+                style={{ width: "100%" }}
+                controls={false}
+              />
+            </Form.Item>
+          </Col>
+          )
+        </Row>
         <Row gutter={16}>
-          <Col span={12}>
+          <Col span={24}>
             <Form.Item
               name="name"
               label="Sphere Name"
@@ -144,7 +308,7 @@ export const CreateSphereModal = ({
               <Input />
             </Form.Item>
           </Col>
-          <Col span={12}>
+          {/* <Col span={12}>
             <Form.Item
               name="color"
               label="Color"
@@ -153,7 +317,7 @@ export const CreateSphereModal = ({
             >
               <input style={{ width: "100%" }} type="color" />
             </Form.Item>
-          </Col>
+          </Col> */}
         </Row>
       </Form>
     </Modal>
