@@ -10,11 +10,12 @@ export type CameraConstructorType = {
   camPosition: number[];
   p5: p5Types;
   p?: number[];
-  screenDimensions: number[];
+  viewport: WindowType;
   window: WindowType;
   near: number;
   far: number;
-  // projectionPlanDistance: number; TODO: Fazer isso com percentagem (igual na planilha)
+  viewUp: number[];
+  projectionPlanDistance: number;
 };
 
 export class Camera {
@@ -23,16 +24,20 @@ export class Camera {
   public vrp: number[] = [];
   public p: number[] = [0, 0, 0];
 
-  private screenDimensions: number[];
+  private viewport: WindowType;
 
   // camera vectors
   public nVector: number[] = [];
   private vVector: number[] = [];
   private uVector: number[] = [];
+  private viewUp: number[];
 
   public Msrusrc: number[][] = nj.zeros([4, 4]).tolist();
   public projectionMatrix: number[][] = nj.zeros([4, 4]).tolist();
   public Mjp: number[][] = nj.zeros([4, 4]).tolist();
+
+  private projectionPlanCenter: number[] = [];
+  public projectionPlanDistance: number;
 
   public window: WindowType = {} as WindowType;
   public near: number;
@@ -42,17 +47,21 @@ export class Camera {
     camPosition,
     p5,
     p = [0, 0, 0],
-    screenDimensions,
+    viewUp,
+    viewport,
     window,
     near,
     far,
+    projectionPlanDistance,
   }: CameraConstructorType) {
     this.p5 = p5;
     this.window = JSON.parse(JSON.stringify(window));
     this.near = near;
     this.far = far;
+    this.projectionPlanDistance = projectionPlanDistance / 100;
+    this.viewUp = [...viewUp];
 
-    this.screenDimensions = [...screenDimensions];
+    this.viewport = JSON.parse(JSON.stringify(viewport));
 
     this.generateCanonicalBase(camPosition, p);
   }
@@ -64,13 +73,14 @@ export class Camera {
     this.vVector = this.defineVVector();
     this.uVector = this.defineUVector();
 
+    this.setProjectionPlanCenter();
     this.setMsrusrc();
     this.setProjectionMatrix();
     this.setMjp(
-      -(this.screenDimensions[0] - 1) / 2, //por causa do 0 no centro da tela
-      (this.screenDimensions[0] - 1) / 2,
-      -(this.screenDimensions[1] - 1) / 2,
-      (this.screenDimensions[1] - 1) / 2,
+      this.viewport.width[0], //por causa do 0 no centro da tela
+      this.viewport.width[1],
+      this.viewport.height[0],
+      this.viewport.height[1],
       this.window.height[0],
       this.window.height[1],
       this.window.width[0],
@@ -90,7 +100,11 @@ export class Camera {
   private defineVVector(): number[] {
     const p5 = this.p5;
 
-    const YVector = p5.createVector(0, 1, 0);
+    const YVector = p5.createVector(
+      this.viewUp[0],
+      this.viewUp[1],
+      this.viewUp[2]
+    );
     const viewDirectionVector = p5.createVector(...this.nVector);
     return YVector.sub(
       viewDirectionVector.mult(YVector.dot(viewDirectionVector))
@@ -126,7 +140,9 @@ export class Camera {
   private setProjectionMatrix(): number[][] {
     const p5 = this.p5;
 
-    const dp = p5.createVector(...this.vrp).dist(p5.createVector(...this.p));
+    const dp = p5
+      .createVector(...this.vrp)
+      .dist(p5.createVector(...this.projectionPlanCenter));
     const zvp = -dp;
 
     const projectionMatrix = [
@@ -201,6 +217,31 @@ export class Camera {
 
   public setFar(far: number) {
     this.far = far;
+  }
+
+  public setProjectionPlanDistance(projectionPlanDistance: number) {
+    this.projectionPlanDistance = projectionPlanDistance / 100;
+    this.generateCanonicalBase(this.vrp, this.p);
+  }
+
+  private setProjectionPlanCenter() {
+    const { vrp, p, projectionPlanDistance } = this;
+
+    this.projectionPlanCenter = [
+      vrp[0] + (p[0] - vrp[0] * projectionPlanDistance),
+      vrp[1] + (p[1] - vrp[1] * projectionPlanDistance),
+      vrp[2] + (p[2] - vrp[2] * projectionPlanDistance),
+    ];
+  }
+
+  public setViewport(viewport: WindowType) {
+    this.viewport = JSON.parse(JSON.stringify(viewport));
+    this.generateCanonicalBase(this.vrp, this.p);
+  }
+
+  public setViewUp(newViewUp: number[]) {
+    this.viewUp = [...newViewUp];
+    this.generateCanonicalBase(this.vrp, this.p);
   }
 
   public updateP(x: number, y: number, z: number) {

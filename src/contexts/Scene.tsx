@@ -49,6 +49,13 @@ type SceneContextType = {
   setAxisToRotate: (axis: "x" | "y" | "z") => void;
   isToRotateLight: boolean;
   setIsToRotateLight: (isToRotateLight: boolean) => void;
+  projectionPlanDistance: number;
+  setProjectionPlanDistance: (projectionPlanDistance: number) => void;
+  viewportSize: WindowType;
+  setViewportSize: (viewPortSize: WindowType) => void;
+  setLocalViewportSize: (viewPortSize: WindowType) => void;
+  viewUp: number[];
+  setViewUp: (viewUp: number[]) => void;
 };
 
 export const SceneContext = createContext({} as SceneContextType);
@@ -81,6 +88,13 @@ export const SceneContextProvider = ({ children }: { children: ReactNode }) => {
       label: "Axonometric",
     },
   };
+  const [projectionPlanDistance, setLocalProjectionPlanDistance] =
+    useState<number>(100);
+  const [viewportSize, setLocalViewportSize] = useState<WindowType>({
+    width: [0, 0],
+    height: [0, 0],
+  });
+  const [viewUp, setLocalViewUp] = useState<number[]>([0, 1, 0]);
 
   const [light, setLight] = useState<Light>({} as Light);
   const [lightPosition, setLocalLightPosition] = useState<number[]>([
@@ -108,6 +122,21 @@ export const SceneContextProvider = ({ children }: { children: ReactNode }) => {
   const setLightIntensity = (newIntensity: number[]) => {
     setLocalLightIntensity(newIntensity);
     light.setLightIntensity(newIntensity);
+  };
+
+  const setViewUp = (newViewUp: number[]) => {
+    setLocalViewUp(newViewUp);
+    myCamera.setViewUp(newViewUp);
+  };
+
+  const setViewportSize = (newSize: WindowType) => {
+    setLocalViewportSize(newSize);
+    myCamera.setViewport(newSize);
+  };
+
+  const setProjectionPlanDistance = (newDistance: number) => {
+    setLocalProjectionPlanDistance(newDistance);
+    myCamera.setProjectionPlanDistance(newDistance);
   };
 
   const setCamP = (position: number[]) => {
@@ -203,6 +232,13 @@ export const SceneContextProvider = ({ children }: { children: ReactNode }) => {
         setAxisToRotate,
         isToRotateLight,
         setIsToRotateLight,
+        projectionPlanDistance,
+        setProjectionPlanDistance,
+        viewportSize,
+        setViewportSize,
+        viewUp,
+        setViewUp,
+        setLocalViewportSize,
       }}
     >
       {children}

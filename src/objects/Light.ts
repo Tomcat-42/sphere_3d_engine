@@ -20,8 +20,11 @@ export class Light {
 
   public getFaceColor(
     face: number[][],
+    observer: number[],
     Ka: number[],
     Kd: number[],
+    Ks: number[],
+    n: number,
     p5: p5Types
   ): number[] {
     const centroid = this.getCentroid(face); // FIXME: Centroid is not correct
@@ -33,8 +36,13 @@ export class Light {
     // );
 
     // const N = normalCalc([centroid, face[0], face[1]], p5);
-    const N = normalCalc(face, p5);
-    const L = p5.createVector(...this.position).sub(referencePoint);
+    const N = normalCalc(face, p5).normalize();
+    const L = p5.createVector(...this.position).sub(referencePoint.copy());
+    // .normalize();
+    const R = N.copy().sub(L).mult(L.copy().mult(2).dot(N)); // (2L * N) * N - L
+    const S = p5
+      .createVector(observer[0], observer[1], observer[2])
+      .sub(referencePoint);
 
     const Fatt = Math.min(
       1 /
@@ -49,9 +57,15 @@ export class Light {
       1
     );
 
-    const ItR = Ka[0] * this.Ila[0] + Fatt * this.Il[0] * (Kd[0] * N.dot(L));
-    const ItG = Ka[1] * this.Ila[1] + Fatt * this.Il[1] * (Kd[1] * N.dot(L));
-    const ItB = Ka[2] * this.Ila[2] + Fatt * this.Il[2] * (Kd[2] * N.dot(L));
+    const ItR =
+      Ka[0] * this.Ila[0] +
+      Fatt * this.Il[0] * (Kd[0] * N.dot(L) + Ks[0] * Math.pow(R.dot(S), n));
+    const ItG =
+      Ka[1] * this.Ila[1] +
+      Fatt * this.Il[1] * (Kd[1] * N.dot(L) + Ks[1] * Math.pow(R.dot(S), n));
+    const ItB =
+      Ka[2] * this.Ila[2] +
+      Fatt * this.Il[2] * (Kd[2] * N.dot(L) + Ks[2] * Math.pow(R.dot(S), n));
 
     return [ItR, ItG, ItB];
   }

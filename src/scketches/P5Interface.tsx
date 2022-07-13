@@ -6,9 +6,7 @@ import { Camera } from "../objects/Camera";
 import { Light } from "../objects/Light";
 import { drawAxonometricFace } from "../utils/drawAxonometricFace";
 import { drawPerspectiveFace } from "../utils/drawPerspectiveFace";
-import { generateCube } from "../utils/generateSquare";
 import { GT } from "../utils/GT";
-import { degreesToRaians } from "../utils/math";
 import { pipe } from "../utils/pipe";
 
 export const P5Interface = () => {
@@ -32,14 +30,11 @@ export const P5Interface = () => {
     lightIntensity,
     axisToRotate,
     isToRotateLight,
+    projectionPlanDistance,
+    setLocalViewportSize,
+    viewUp,
   } = useSceneContext();
-  let canvasSize: number[] = [
-    document.getElementById("mainCanvas")?.clientWidth || 0,
-    document.getElementById("mainCanvas")?.clientHeight || 0,
-  ];
-  // let shader: p5Types.Shader;
 
-  // FIXME: Change Camera parameters of viewport
   const windowResized = (p5: p5Types) => {
     const element = document.getElementById("mainCanvas");
     const size = [
@@ -47,23 +42,12 @@ export const P5Interface = () => {
       element?.clientHeight || window.innerHeight,
     ];
     p5.resizeCanvas(size[0], size[1]);
-    canvasSize = size;
-    // shader?.setUniform("uScreenSize", size);
+    // TODO: Validar se devo atualizar o viewportSize quando o tamanho da tela for alterado
+    // setViewportSize({
+    //   width: [-size[0] / 2, size[0] / 2],
+    //   height: [-size[1] / 2, size[1] / 2],
+    // });
   };
-
-  const colorsByIdx = [
-    [Math.random(), Math.random(), Math.random()],
-    [Math.random(), Math.random(), Math.random()],
-    [Math.random(), Math.random(), Math.random()],
-    [Math.random(), Math.random(), Math.random()],
-    [Math.random(), Math.random(), Math.random()],
-    [Math.random(), Math.random(), Math.random()],
-  ];
-
-  const cubes = [
-    generateCube(50, { x: 0, y: 0, z: -65 }),
-    generateCube(25, { x: 0, y: 0, z: 0 }),
-  ];
 
   const setup = (p5: p5Types, parent: Element) => {
     const element = document.getElementById("mainCanvas");
@@ -71,16 +55,24 @@ export const P5Interface = () => {
       element?.clientWidth || window.innerWidth,
       element?.clientHeight || window.innerHeight,
     ];
-    canvasSize = initialSize;
+    setLocalViewportSize({
+      width: [-initialSize[0] / 2, initialSize[0] / 2],
+      height: [-initialSize[1] / 2, initialSize[1] / 2],
+    });
     setMyCamera(
       new Camera({
         camPosition: cameraVrpInterface,
         p5,
         p: camP,
-        screenDimensions: canvasSize,
+        viewport: {
+          width: [-initialSize[0] / 2, initialSize[0] / 2],
+          height: [-initialSize[1] / 2, initialSize[1] / 2],
+        },
+        viewUp,
         window: windowSize,
         near: camNear,
         far: camFar,
+        projectionPlanDistance,
       })
     );
     setLight(
@@ -95,11 +87,7 @@ export const P5Interface = () => {
       "mainCanvas"
     );
 
-    // shader = p5.createShader(oneColorVert, oneColorFrag);
-    // p5.shader(shader);
-
     p5.debugMode(p5.AXES);
-    // p5.noStroke();
   };
 
   const moveCamera = (camera: Camera, keyCode: number) => {
@@ -116,7 +104,7 @@ export const P5Interface = () => {
   };
 
   const draw = (p5: p5Types) => {
-    p5.background(40);
+    p5.background(0);
 
     if (p5.keyIsPressed) moveCamera(myCamera, p5.keyCode);
 
@@ -143,24 +131,21 @@ export const P5Interface = () => {
         sphereFace.forEach((vertexIdx: number[]) =>
           face.push(sphere.vertices[vertexIdx[0]][vertexIdx[1]])
         );
-        const color = light.getFaceColor(face, sphere.Ka, sphere.Kd, p5);
-        // console.debug(color);
+        const color = light.getFaceColor(
+          face,
+          myCamera.vrp,
+          sphere.Ka,
+          sphere.Kd,
+          sphere.Ks,
+          2,
+          p5
+        );
         const isSelected = selectedSphereId === sphere.id;
         if (drawMode === drawModeEnum.perspective)
           drawPerspectiveFace(myCamera, face, color, isSelected, p5);
         else drawAxonometricFace(p5, face, color, isSelected, myCamera);
       });
     });
-
-    // cubes.forEach((cube) => {
-    //   cube.forEach((face: number[][], idx: number) => {
-    //     shader.setUniform("uColor", colorsByIdx[idx]);
-
-    //     if (drawMode === drawModeEnum.perspective)
-    //       drawPerspectiveFace(myCamera, face, p5);
-    //     else drawAxonometricFace(p5, face, myCamera);
-    //   });
-    // });
   };
 
   return <Sketch setup={setup} windowResized={windowResized} draw={draw} />;
