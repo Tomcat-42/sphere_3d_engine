@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Sphere Generator",
+  "name": "3D Sphere Generator",
   "icons": [
     {
       "src": "favicon.ico",
