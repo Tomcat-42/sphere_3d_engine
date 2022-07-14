@@ -4,18 +4,23 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { SceneContextProvider } from "./contexts/Scene";
-import { Shader } from "./Shader";
-import { P5Interface } from "./scketches/P5Interface";
+import { ShaderSceneContextProvider } from "./contexts/ShaderScene";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { ShaderedApp } from "./ShaderedApp";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
   <SceneContextProvider>
-    {
-      // <Shader />
-      <App />
-    }
+    <ShaderSceneContextProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/shader" element={<ShaderedApp />} />
+        </Routes>
+      </BrowserRouter>
+    </ShaderSceneContextProvider>
   </SceneContextProvider>
 );
 

@@ -10,8 +10,8 @@ import {
   Typography,
 } from "antd";
 import { FC, useState } from "react";
-import { useSceneContext } from "../contexts/Scene";
-import { SphereType } from "../objects/Sphere";
+import { useSceneContext } from "../../contexts/Scene";
+import { SphereType } from "../../objects/Sphere";
 const { Panel } = Collapse;
 const { Option } = Select;
 

@@ -1,6 +1,10 @@
 import { Col, Form, Input, InputNumber, Modal, Row, Typography } from "antd";
-import { useSceneContext } from "../contexts/Scene";
-import { Sphere, SphereConstructorType, SphereType } from "../objects/Sphere";
+import { useShaderSceneContext } from "../../contexts/ShaderScene";
+import {
+  Sphere,
+  SphereConstructorType,
+  SphereType,
+} from "../../objects/Sphere";
 
 export const CreateSphereModal = ({
   defaultSphere,
@@ -12,7 +16,7 @@ export const CreateSphereModal = ({
   setVisibility: (value: boolean) => void;
 }) => {
   const [form] = Form.useForm();
-  const { setSceneObjects, sceneObjects } = useSceneContext();
+  const { setSceneObjects, sceneObjects } = useShaderSceneContext();
   const isToEditSphere = defaultSphere ? true : false;
 
   const formatFormData = (data: any) => {

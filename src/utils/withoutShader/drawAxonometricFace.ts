@@ -1,7 +1,7 @@
 import * as math from "mathjs";
 import p5Types from "p5";
-import { Camera } from "../objects/Camera";
-import { normalCalc } from "./normalCalc";
+import { Camera } from "../../objects/Camera";
+import { normalCalc } from "../normalCalc";
 
 export const drawAxonometricFace = (
   p5: p5Types,

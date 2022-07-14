@@ -1,5 +1,5 @@
 import { Checkbox, Col, InputNumber, Row, Select, Typography } from "antd";
-import { useSceneContext } from "../contexts/Scene";
+import { useShaderSceneContext } from "../../contexts/ShaderScene";
 const { Option } = Select;
 
 export const LightTab = () => {
@@ -16,7 +16,7 @@ export const LightTab = () => {
 
 const RotateLight = () => {
   const { isToRotateLight, setIsToRotateLight, axisToRotate, setAxisToRotate } =
-    useSceneContext();
+    useShaderSceneContext();
 
   return (
     <>
@@ -45,7 +45,7 @@ const RotateLight = () => {
 };
 
 const CommomLight = () => {
-  const { lightIntensity, setLightIntensity } = useSceneContext();
+  const { lightIntensity, setLightIntensity } = useShaderSceneContext();
 
   return (
     <>
@@ -98,7 +98,7 @@ const CommomLight = () => {
 };
 
 const AmbientLight = () => {
-  const { ambientLightIntensity, setAmbientLightIntensity } = useSceneContext();
+  const { ambientLightIntensity, setAmbientLightIntensity } = useShaderSceneContext();
 
   return (
     <>
@@ -163,7 +163,7 @@ const AmbientLight = () => {
 };
 
 const LightPosition = () => {
-  const { lightPosition, setLightPosition } = useSceneContext();
+  const { lightPosition, setLightPosition } = useShaderSceneContext();
 
   return (
     <>
@@ -242,6 +242,8 @@ const ShadingType = () => {
         style={{ width: "100%" }}
       >
         <Option value={"flat"}>Flat Shading</Option>
+        <Option value={"gouraud"}>Gouraud</Option>
+        <Option value={"phong"}>Phong</Option>
       </Select>
     </>
   );

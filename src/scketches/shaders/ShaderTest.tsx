@@ -1,7 +1,7 @@
 import Sketch from "react-p5";
 import p5Types from "p5";
 import { useEffect, useState } from "react";
-import { oneColorFrag, oneColorVert } from "./test";
+import { oneColorFrag, oneColorVert } from "./";
 
 export const ShaderTest = () => {
   // const [myRect, setMyRect] = useState<p5Types.Graphics>(
@@ -20,7 +20,7 @@ export const ShaderTest = () => {
   };
 
   const setup = (p5: p5Types) => {
-    p5.createCanvas(width, height, p5.WEBGL)
+    p5.createCanvas(width, height, p5.WEBGL);
     // .parent("shaderCanvas");
 
     shader = p5.createShader(oneColorVert, oneColorFrag);
@@ -38,10 +38,10 @@ export const ShaderTest = () => {
 
     p5.beginShape();
     //face 1
-    p5.vertex(- squareSize, - squareSize);
-    p5.vertex(+ squareSize, - squareSize);
-    p5.vertex(+ squareSize, + squareSize);
-    p5.vertex(- squareSize, + squareSize);
+    p5.vertex(-squareSize, -squareSize);
+    p5.vertex(+squareSize, -squareSize);
+    p5.vertex(+squareSize, +squareSize);
+    p5.vertex(-squareSize, +squareSize);
     p5.endShape(p5.CLOSE);
     p5.pop();
   };

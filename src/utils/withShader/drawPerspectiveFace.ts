@@ -1,13 +1,12 @@
 import * as math from "mathjs";
 import p5Types from "p5";
-import { Camera } from "../objects/Camera";
-import { normalCalc } from "./normalCalc";
-import { pipe } from "./pipe";
+import { Camera } from "../../objects/Camera";
+import { normalCalc } from "../normalCalc";
+import { pipe } from "../pipe";
 
 export const drawPerspectiveFace = (
   camera: Camera,
   face: number[][],
-  color: number[],
   selected: boolean,
   p5: p5Types
 ) => {
@@ -25,8 +24,7 @@ export const drawPerspectiveFace = (
     p5.stroke("yellow");
     p5.strokeWeight(1);
   } else p5.strokeWeight(0);
-  
-  p5.fill(color[0], color[1], color[2]);
+
   p5.beginShape();
 
   for (let i = 0; i < points.size()[1]; i++) {

@@ -1,18 +1,19 @@
 import { ClearOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Collapse, Layout, Row, Tabs, Tooltip, Typography } from "antd";
 import { useState } from "react";
-import { CameraTab } from "./components/WithoutShader/CameraTab";
-import { LightTab } from "./components/WithoutShader/LightTab";
-import { CreateSphereModal } from "./components/WithoutShader/SphereModal";
-import { SphereTab } from "./components/WithoutShader/SphereTab";
-import { useSceneContext } from "./contexts/Scene";
+import { CameraTab } from "./components/WithShader/CameraTab";
+import { LightTab } from "./components/WithShader/LightTab";
+import { CreateSphereModal } from "./components/WithShader/SphereModal";
+import { SphereTab } from "./components/WithShader/SphereTab";
+import { useShaderSceneContext } from "./contexts/ShaderScene";
 import { SphereType } from "./objects/Sphere";
 import { P5Interface } from "./scketches/P5Interface";
+import { ShaderedScketch } from "./scketches/ShaderedScketch";
 const { Sider, Content } = Layout;
 const { TabPane } = Tabs;
 
-function App() {
-  const { setSelectedSphereId, clearInterface } = useSceneContext();
+export const ShaderedApp = () => {
+  const { setSelectedSphereId, clearInterface } = useShaderSceneContext();
 
   const [createSphereModalVisible, setCreateSphereModalVisible] =
     useState(false);
@@ -47,7 +48,7 @@ function App() {
           alignItems: "center",
         }}
       >
-        <P5Interface />
+        <ShaderedScketch />
       </Content>
       <Sider
         style={{
@@ -114,6 +115,4 @@ function App() {
       </Sider>
     </Layout>
   );
-}
-
-export default App;
+};

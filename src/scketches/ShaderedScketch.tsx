@@ -1,15 +1,17 @@
 import p5Types from "p5";
 import Sketch from "react-p5";
 import { DirectionEnum } from "../constants";
-import { useSceneContext } from "../contexts/Scene";
+import { useShaderSceneContext } from "../contexts/ShaderScene";
 import { Camera } from "../objects/Camera";
 import { Light } from "../objects/Light";
-import { drawAxonometricFace } from "../utils/withoutShader/drawAxonometricFace";
-import { drawPerspectiveFace } from "../utils/withoutShader/drawPerspectiveFace";
+import { drawAxonometricFace } from "../utils/withShader/drawAxonometricFace";
+import { drawPerspectiveFace } from "../utils/withShader/drawPerspectiveFace";
 import { GT } from "../utils/GT";
+import { normalCalc } from "../utils/normalCalc";
 import { pipe } from "../utils/pipe";
+import { oneColorFrag, oneColorVert } from "./shaders";
 
-export const P5Interface = () => {
+export const ShaderedScketch = () => {
   const {
     sceneObjects,
     myCamera,
@@ -33,7 +35,9 @@ export const P5Interface = () => {
     projectionPlanDistance,
     setLocalViewportSize,
     viewUp,
-  } = useSceneContext();
+    shader,
+    setShader,
+  } = useShaderSceneContext();
 
   const windowResized = (p5: p5Types) => {
     const element = document.getElementById("mainCanvas");
@@ -86,6 +90,9 @@ export const P5Interface = () => {
     p5.createCanvas(initialSize[0], initialSize[1], p5.WEBGL).parent(
       "mainCanvas"
     );
+    const localShader = p5.createShader(oneColorVert, oneColorFrag);
+    p5.shader(localShader);
+    setShader(localShader);
 
     p5.debugMode(p5.AXES);
   };
@@ -104,7 +111,7 @@ export const P5Interface = () => {
   };
 
   const draw = (p5: p5Types) => {
-    p5.background(0);
+    p5.background(40);
 
     if (p5.keyIsPressed) moveCamera(myCamera, p5.keyCode);
 
@@ -131,19 +138,21 @@ export const P5Interface = () => {
         sphereFace.forEach((vertexIdx: number[]) =>
           face.push(sphere.vertices[vertexIdx[0]][vertexIdx[1]])
         );
-        const color = light.getFaceColor(
-          face,
-          myCamera.vrp,
-          sphere.Ka,
-          sphere.Kd,
-          sphere.Ks,
-          2,
-          p5
-        );
+        shader.setUniform("uFaceNormal", normalCalc(face, p5).array());
+        shader.setUniform("uObserver", myCamera.vrp);
+        shader.setUniform("uLightPosition", light.position);
+        shader.setUniform("uReferencePoint", face[0]);
+        shader.setUniform("uKa", sphere.Ka);
+        shader.setUniform("uKd", sphere.Kd);
+        shader.setUniform("uKs", sphere.Ks);
+        shader.setUniform("n", 32);
+        shader.setUniform("uIla", light.Ila);
+        shader.setUniform("uIl", light.Il);
+
         const isSelected = selectedSphereId === sphere.id;
         if (drawMode === drawModeEnum.perspective)
-          drawPerspectiveFace(myCamera, face, color, isSelected, p5);
-        else drawAxonometricFace(p5, face, color, isSelected, myCamera);
+          drawPerspectiveFace(myCamera, face, isSelected, p5);
+        else drawAxonometricFace(p5, face, isSelected, myCamera);
       });
     });
   };

@@ -9,7 +9,7 @@ import {
   Typography,
 } from "antd";
 import { FC } from "react";
-import { useSceneContext } from "../contexts/Scene";
+import { useShaderSceneContext } from "../../contexts/ShaderScene";
 const { Option } = Select;
 
 export const CameraTab: FC = () => {
@@ -28,7 +28,7 @@ export const CameraTab: FC = () => {
 };
 
 const ViewUp = () => {
-  const { viewUp, setViewUp } = useSceneContext();
+  const { viewUp, setViewUp } = useShaderSceneContext();
   return (
     <>
       <Typography.Title style={{ marginTop: "1rem" }} level={4}>
@@ -74,7 +74,7 @@ const ViewUp = () => {
 };
 
 const ViewportSize = () => {
-  const { viewportSize, setViewportSize } = useSceneContext();
+  const { viewportSize, setViewportSize } = useShaderSceneContext();
 
   return (
     <>
@@ -159,7 +159,7 @@ const ViewportSize = () => {
 
 const ProjectionPlanDistance = () => {
   const { projectionPlanDistance, setProjectionPlanDistance } =
-    useSceneContext();
+    useShaderSceneContext();
 
   return (
     <>
@@ -184,7 +184,7 @@ const ProjectionPlanDistance = () => {
 };
 
 const ProjectionType = () => {
-  const { projectionType, drawMode, setDrawMode } = useSceneContext();
+  const { projectionType, drawMode, setDrawMode } = useShaderSceneContext();
 
   return (
     <>
@@ -208,7 +208,7 @@ const ProjectionType = () => {
 };
 
 const NearAndFar = () => {
-  const { camNear, setCamNear, camFar, setCamFar } = useSceneContext();
+  const { camNear, setCamNear, camFar, setCamFar } = useShaderSceneContext();
 
   return (
     <>
@@ -246,7 +246,7 @@ const NearAndFar = () => {
 };
 
 const WindowSize = () => {
-  const { windowSize, setWindowSize } = useSceneContext();
+  const { windowSize, setWindowSize } = useShaderSceneContext();
 
   return (
     <>
@@ -330,7 +330,7 @@ const WindowSize = () => {
 };
 
 const CameraP = () => {
-  const { camP, setCamP } = useSceneContext();
+  const { camP, setCamP } = useShaderSceneContext();
 
   return (
     <>
@@ -380,7 +380,7 @@ const CameraP = () => {
 };
 
 const CameraVrp = () => {
-  const { cameraVrpInterface, setCamVRP } = useSceneContext();
+  const { cameraVrpInterface, setCamVRP } = useShaderSceneContext();
 
   return (
     <>
