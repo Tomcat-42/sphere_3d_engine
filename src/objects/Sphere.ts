@@ -34,6 +34,7 @@ export type SphereType = {
   Ka: number[];
   Kd: number[];
   Ks: number[];
+  n: number;
   vertices: number[][][];
   faces: number[][][];
   updateData: (data: UpdateSphereType) => void;
@@ -55,6 +56,7 @@ export type SphereConstructorType = {
   Ka: number[];
   Kd: number[];
   Ks: number[];
+  n: number;
 };
 
 type UpdateSphereType = {
@@ -66,6 +68,7 @@ type UpdateSphereType = {
   Ka?: number[];
   Kd?: number[];
   Ks?: number[];
+  n?: number;
 };
 
 export class Sphere {
@@ -85,6 +88,7 @@ export class Sphere {
   public Ka: number[];
   public Kd: number[];
   public Ks: number[];
+  public n: number;
 
   constructor({
     meridians,
@@ -96,6 +100,7 @@ export class Sphere {
     Ka,
     Kd,
     Ks,
+    n,
   }: SphereConstructorType) {
     this.Ka = [...Ka];
     this.Kd = [...Kd];
@@ -121,6 +126,8 @@ export class Sphere {
       .zeros(this.meridiansAmout * (this.parallelsAmount + 2) * 3)
       .reshape(this.parallelsAmount + 2, this.meridiansAmout, 3)
       .tolist();
+
+    this.n = n;
 
     this.defineVertices();
     this.defineFaces();
@@ -349,6 +356,7 @@ export class Sphere {
     Ka,
     Kd,
     Ks,
+    n,
   }: UpdateSphereType) {
     const isToReDraw =
       radius !== this.radius ||
@@ -363,6 +371,7 @@ export class Sphere {
     this.Ka = Ka || this.Ka;
     this.Kd = Kd || this.Kd;
     this.Ks = Ks || this.Ks;
+    this.n = n || this.n;
 
     if (!isToReDraw) return;
 

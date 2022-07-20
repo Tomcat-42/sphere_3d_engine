@@ -1,6 +1,7 @@
 import * as math from "mathjs";
 import nj from "numjs";
 import p5Types from "p5";
+import { drawModeEnum } from "../contexts/Scene";
 
 export type WindowType = {
   width: number[];
@@ -17,6 +18,7 @@ export type CameraConstructorType = {
   far: number;
   viewUp: number[];
   projectionPlanDistance: number;
+  projectionType: drawModeEnum;
 };
 
 export class Camera {
@@ -35,7 +37,10 @@ export class Camera {
 
   public Msrusrc: number[][] = nj.zeros([4, 4]).tolist();
   public projectionMatrix: number[][] = nj.zeros([4, 4]).tolist();
+  public perspectiveMatrix: number[][] = nj.zeros([4, 4]).tolist();
+  public axonometricMatrix: number[][];
   public Mjp: number[][] = nj.zeros([4, 4]).tolist();
+  private lastProjectionType: drawModeEnum;
 
   private projectionPlanCenter: number[] = [];
   public projectionPlanDistance: number;
@@ -56,6 +61,7 @@ export class Camera {
     near,
     far,
     projectionPlanDistance,
+    projectionType,
   }: CameraConstructorType) {
     this.p5 = p5;
     this.window = JSON.parse(JSON.stringify(window));
@@ -63,6 +69,9 @@ export class Camera {
     this.far = far;
     this.projectionPlanDistance = projectionPlanDistance / 100;
     this.viewUp = [...viewUp];
+    this.axonometricMatrix = nj.identity(4).tolist();
+    this.axonometricMatrix[2][2] = 0;
+    this.lastProjectionType = projectionType;
 
     this.viewport = JSON.parse(JSON.stringify(viewport));
 
@@ -78,7 +87,7 @@ export class Camera {
 
     this.setProjectionPlanCenter();
     this.setMsrusrc();
-    this.setProjectionMatrix();
+    this.setPerspectiveMatrix();
     this.setMjp(
       this.viewport.width[0], //por causa do 0 no centro da tela
       this.viewport.width[1],
@@ -89,6 +98,7 @@ export class Camera {
       this.window.width[0],
       this.window.width[1]
     );
+    this.setProjectionMatrix(this.lastProjectionType);
     this.setConcatenedMatrix();
   }
 
@@ -141,7 +151,17 @@ export class Camera {
     return Msrusrc;
   }
 
-  private setProjectionMatrix(): number[][] {
+  public setProjectionMatrix(projectionType: drawModeEnum) {
+    this.lastProjectionType = projectionType;
+    if (projectionType === drawModeEnum.perspective)
+      this.projectionMatrix = this.perspectiveMatrix;
+    else if (projectionType === drawModeEnum.axonometric)
+      this.projectionMatrix = this.axonometricMatrix;
+
+    this.setConcatenedMatrix();
+  }
+
+  private setPerspectiveMatrix(): number[][] {
     const p5 = this.p5;
 
     const dp = p5
@@ -149,15 +169,15 @@ export class Camera {
       .dist(p5.createVector(...this.projectionPlanCenter));
     const zvp = -dp;
 
-    const projectionMatrix = [
+    const perspectiveMatrix = [
       [1, 0, 0, 0],
       [0, 1, 0, 0],
       [0, 0, -zvp / dp, 0],
       [0, 0, -1 / dp, 0],
     ];
-    this.projectionMatrix = projectionMatrix;
+    this.perspectiveMatrix = perspectiveMatrix;
 
-    return projectionMatrix;
+    return perspectiveMatrix;
   }
 
   private setMjp(

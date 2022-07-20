@@ -298,7 +298,7 @@ export const CreateSphereModal = ({
           )
         </Row>
         <Row gutter={16}>
-          <Col span={24}>
+          <Col span={12}>
             <Form.Item
               name="name"
               label="Sphere Name"
@@ -310,6 +310,16 @@ export const CreateSphereModal = ({
               rules={[{ required: true }]}
             >
               <Input />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="n"
+              label="Shadiness"
+              initialValue={defaultSphere ? defaultSphere?.n : 32}
+              rules={[{ required: true }]}
+            >
+              <InputNumber style={{ width: "100%" }} controls={false} min={1} />
             </Form.Item>
           </Col>
         </Row>

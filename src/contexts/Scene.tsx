@@ -3,7 +3,7 @@ import { Camera, WindowType } from "../objects/Camera";
 import { Light } from "../objects/Light";
 import { SphereType } from "../objects/Sphere";
 
-enum drawModeEnum {
+export enum drawModeEnum {
   perspective = "perspective",
   axonometric = "axonometric",
 }
@@ -63,7 +63,7 @@ export const SceneContext = createContext({} as SceneContextType);
 export const SceneContextProvider = ({ children }: { children: ReactNode }) => {
   const [sceneObjects, setSceneObjects] = useState<SphereType[]>([]);
   const [selectedSphereId, setSelectedSphereId] = useState<string | null>(null);
-  const [drawMode, setDrawMode] = useState<drawModeEnum>(
+  const [drawMode, setLocalDrawMode] = useState<drawModeEnum>(
     drawModeEnum.perspective
   );
 
@@ -108,6 +108,11 @@ export const SceneContextProvider = ({ children }: { children: ReactNode }) => {
   ]);
   const [axisToRotate, setAxisToRotate] = useState<"x" | "y" | "z">("y");
   const [isToRotateLight, setIsToRotateLight] = useState<boolean>(false);
+
+  const setDrawMode = (newDrawMode: drawModeEnum) => {
+    myCamera.setProjectionMatrix(newDrawMode);
+    setLocalDrawMode(newDrawMode);
+  };
 
   const setLightPosition = (newPosition: number[]) => {
     setLocalLightPosition(newPosition);

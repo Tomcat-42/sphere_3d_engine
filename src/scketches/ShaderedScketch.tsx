@@ -7,8 +7,7 @@ import { Light } from "../objects/Light";
 import { GT } from "../utils/GT";
 import { normalCalc } from "../utils/normalCalc";
 import { pipe } from "../utils/pipe";
-import { drawAxonometricFace } from "../utils/withShader/drawAxonometricFace";
-import { drawPerspectiveFace } from "../utils/withShader/drawPerspectiveFace";
+import { drawFace } from "../utils/withShader/drawFace";
 import { oneColorFrag, oneColorVert } from "./shaders";
 
 export const ShaderedScketch = () => {
@@ -18,7 +17,6 @@ export const ShaderedScketch = () => {
     setMyCamera,
     selectedSphereId,
     drawMode,
-    drawModeEnum,
     setCameraVrpInterface,
     cameraVrpInterface,
     camP,
@@ -77,6 +75,7 @@ export const ShaderedScketch = () => {
         near: camNear,
         far: camFar,
         projectionPlanDistance,
+        projectionType: drawMode,
       })
     );
     setLight(
@@ -153,15 +152,12 @@ export const ShaderedScketch = () => {
         shader.setUniform("uKa", sphere.Ka);
         shader.setUniform("uKd", sphere.Kd);
         shader.setUniform("uKs", sphere.Ks);
-        shader.setUniform("uN", 64);
+        shader.setUniform("uN", sphere.n);
         shader.setUniform("uIla", light.Ila);
         shader.setUniform("uIl", light.Il);
 
         const isSelected = selectedSphereId === sphere.id;
-        //TODO: Change this function just to pass right matrix
-        if (drawMode === drawModeEnum.perspective)
-          drawPerspectiveFace(myCamera, face, isSelected, p5);
-        else drawAxonometricFace(p5, face, isSelected, myCamera);
+        drawFace(p5, face, isSelected, myCamera, drawMode);
       });
     });
   };

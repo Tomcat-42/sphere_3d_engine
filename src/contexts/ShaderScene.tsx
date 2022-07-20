@@ -70,7 +70,7 @@ export const ShaderSceneContextProvider = ({
 }) => {
   const [sceneObjects, setSceneObjects] = useState<SphereType[]>([]);
   const [selectedSphereId, setSelectedSphereId] = useState<string | null>(null);
-  const [drawMode, setDrawMode] = useState<drawModeEnum>(
+  const [drawMode, setLocalDrawMode] = useState<drawModeEnum>(
     drawModeEnum.perspective
   );
 
@@ -117,6 +117,11 @@ export const ShaderSceneContextProvider = ({
   const [isToRotateLight, setIsToRotateLight] = useState<boolean>(false);
 
   const [shader, setShader] = useState<p5Types.Shader>({} as p5Types.Shader);
+
+  const setDrawMode = (newDrawMode: drawModeEnum) => {
+    myCamera.setProjectionMatrix(newDrawMode);
+    setLocalDrawMode(newDrawMode);
+  };
 
   const setLightPosition = (newPosition: number[]) => {
     setLocalLightPosition(newPosition);

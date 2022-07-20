@@ -4,10 +4,10 @@ import { DirectionEnum } from "../constants";
 import { useSceneContext } from "../contexts/Scene";
 import { Camera } from "../objects/Camera";
 import { Light } from "../objects/Light";
-import { drawAxonometricFace } from "../utils/withoutShader/drawAxonometricFace";
-import { drawPerspectiveFace } from "../utils/withoutShader/drawPerspectiveFace";
 import { GT } from "../utils/GT";
 import { pipe } from "../utils/pipe";
+import { drawAxonometricFace } from "../utils/withoutShader/drawAxonometricFace";
+import { drawPerspectiveFace } from "../utils/withoutShader/drawPerspectiveFace";
 
 export const P5Interface = () => {
   const {
@@ -33,6 +33,8 @@ export const P5Interface = () => {
     projectionPlanDistance,
     setLocalViewportSize,
     viewUp,
+    setViewportSize,
+    projectionType,
   } = useSceneContext();
 
   const windowResized = (p5: p5Types) => {
@@ -42,11 +44,10 @@ export const P5Interface = () => {
       element?.clientHeight || window.innerHeight,
     ];
     p5.resizeCanvas(size[0], size[1]);
-    // TODO: Validar se devo atualizar o viewportSize quando o tamanho da tela for alterado
-    // setViewportSize({
-    //   width: [-size[0] / 2, size[0] / 2],
-    //   height: [-size[1] / 2, size[1] / 2],
-    // });
+    setViewportSize({
+      width: [-size[0] / 2, size[0] / 2],
+      height: [-size[1] / 2, size[1] / 2],
+    });
   };
 
   const setup = (p5: p5Types, parent: Element) => {
@@ -73,6 +74,7 @@ export const P5Interface = () => {
         near: camNear,
         far: camFar,
         projectionPlanDistance,
+        projectionType: drawMode,
       })
     );
     setLight(
