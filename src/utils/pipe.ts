@@ -2,13 +2,7 @@ import { Camera } from "../objects/Camera";
 import * as math from "mathjs";
 
 export const pipe = (camera: Camera, face: number[][]): math.Matrix => {
-  const concatenedPipeMatrices = math.multiply(
-    math.multiply(
-      math.matrix(camera.Mjp),
-      math.matrix(camera.projectionMatrix)
-    ),
-    math.matrix(camera.Msrusrc)
-  );
+  const concatenedPipeMatrices = camera.getConcatenatedMatrix();
 
   const pointsMatrix = math.multiply(
     concatenedPipeMatrices,

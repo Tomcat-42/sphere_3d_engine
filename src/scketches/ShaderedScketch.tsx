@@ -4,11 +4,11 @@ import { DirectionEnum } from "../constants";
 import { useShaderSceneContext } from "../contexts/ShaderScene";
 import { Camera } from "../objects/Camera";
 import { Light } from "../objects/Light";
-import { drawAxonometricFace } from "../utils/withShader/drawAxonometricFace";
-import { drawPerspectiveFace } from "../utils/withShader/drawPerspectiveFace";
 import { GT } from "../utils/GT";
 import { normalCalc } from "../utils/normalCalc";
 import { pipe } from "../utils/pipe";
+import { drawAxonometricFace } from "../utils/withShader/drawAxonometricFace";
+import { drawPerspectiveFace } from "../utils/withShader/drawPerspectiveFace";
 import { oneColorFrag, oneColorVert } from "./shaders";
 
 export const ShaderedScketch = () => {
@@ -37,6 +37,7 @@ export const ShaderedScketch = () => {
     viewUp,
     shader,
     setShader,
+    setViewportSize,
   } = useShaderSceneContext();
 
   const windowResized = (p5: p5Types) => {
@@ -46,11 +47,10 @@ export const ShaderedScketch = () => {
       element?.clientHeight || window.innerHeight,
     ];
     p5.resizeCanvas(size[0], size[1]);
-    // TODO: Validar se devo atualizar o viewportSize quando o tamanho da tela for alterado
-    // setViewportSize({
-    //   width: [-size[0] / 2, size[0] / 2],
-    //   height: [-size[1] / 2, size[1] / 2],
-    // });
+    setViewportSize({
+      width: [-size[0] / 2, size[0] / 2],
+      height: [-size[1] / 2, size[1] / 2],
+    });
   };
 
   const setup = (p5: p5Types, parent: Element) => {
@@ -122,13 +122,16 @@ export const ShaderedScketch = () => {
     p5.stroke(light.Il[0], light.Il[1], light.Il[2]);
     p5.translate(yes.get([0, 0]), yes.get([1, 0]), yes.get([2, 0]));
     p5.sphere(5);
-    p5.noFill();
     p5.pop();
 
     sceneObjects.forEach((sphere) => {
       const distance = p5
-        .createVector(...sphere.center)
-        .dist(p5.createVector(...myCamera.vrp));
+        .createVector(...myCamera.nVector)
+        .dot(
+          p5
+            .createVector(...myCamera.vrp)
+            .sub(p5.createVector(...sphere.center))
+        );
 
       if (distance < myCamera.near || distance > myCamera.far) return;
 
@@ -138,18 +141,24 @@ export const ShaderedScketch = () => {
         sphereFace.forEach((vertexIdx: number[]) =>
           face.push(sphere.vertices[vertexIdx[0]][vertexIdx[1]])
         );
-        shader.setUniform("uFaceNormal", normalCalc(face, p5).array());
-        shader.setUniform("uObserver", myCamera.vrp);
-        shader.setUniform("uLightPosition", light.position);
-        shader.setUniform("uReferencePoint", face[0]);
+
+        p5.noStroke();
+        p5.push();
+        shader.setUniform("uFaceNormal", [
+          ...normalCalc(face, p5).copy().array(),
+        ]);
+        shader.setUniform("uObserver", [...myCamera.vrp]);
+        shader.setUniform("uLightPosition", [...light.position]);
+        shader.setUniform("uReferencePoint", [...light.getCentroid(face)]);
         shader.setUniform("uKa", sphere.Ka);
         shader.setUniform("uKd", sphere.Kd);
         shader.setUniform("uKs", sphere.Ks);
-        shader.setUniform("n", 32);
+        shader.setUniform("uN", 64);
         shader.setUniform("uIla", light.Ila);
         shader.setUniform("uIl", light.Il);
 
         const isSelected = selectedSphereId === sphere.id;
+        //TODO: Change this function just to pass right matrix
         if (drawMode === drawModeEnum.perspective)
           drawPerspectiveFace(myCamera, face, isSelected, p5);
         else drawAxonometricFace(p5, face, isSelected, myCamera);

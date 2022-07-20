@@ -255,7 +255,7 @@ export const CreateSphereModal = ({
               name="KsR"
               label="R"
               rules={[{ required: true }]}
-              initialValue={isToEditSphere ? defaultSphere?.Ks[0] : 0}
+              initialValue={isToEditSphere ? defaultSphere?.Ks[0] : 0.3}
             >
               <InputNumber
                 min={0}
@@ -312,16 +312,6 @@ export const CreateSphereModal = ({
               <Input />
             </Form.Item>
           </Col>
-          {/* <Col span={12}>
-            <Form.Item
-              name="color"
-              label="Color"
-              rules={[{ required: true }]}
-              initialValue={isToEditSphere ? defaultSphere?.color : "#00ff00"}
-            >
-              <input style={{ width: "100%" }} type="color" />
-            </Form.Item>
-          </Col> */}
         </Row>
       </Form>
     </Modal>

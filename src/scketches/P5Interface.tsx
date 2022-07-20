@@ -120,8 +120,12 @@ export const P5Interface = () => {
 
     sceneObjects.forEach((sphere) => {
       const distance = p5
-        .createVector(...sphere.center)
-        .dist(p5.createVector(...myCamera.vrp));
+        .createVector(...myCamera.nVector)
+        .dot(
+          p5
+            .createVector(...myCamera.vrp)
+            .sub(p5.createVector(...sphere.center))
+        );
 
       if (distance < myCamera.near || distance > myCamera.far) return;
 

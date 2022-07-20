@@ -194,7 +194,6 @@ export class Sphere {
         faces.push(face);
       }
     }
-
     this.faces = faces;
   }
 

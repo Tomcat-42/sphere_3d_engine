@@ -28,34 +28,41 @@ export class Light {
     p5: p5Types
   ): number[] {
     const centroid = this.getCentroid(face); // FIXME: Centroid is not correct
-    const referencePoint = p5.createVector(face[0][0], face[0][1], face[0][2]);
-    // const referencePoint = p5.createVector(
-    //   centroid[0],
-    //   centroid[1],
-    //   centroid[2]
-    // );
+    const referencePoint = p5.createVector(
+      centroid[0],
+      centroid[1],
+      centroid[2]
+    );
 
-    // const N = normalCalc([centroid, face[0], face[1]], p5);
-    const N = normalCalc(face, p5).normalize();
-    const L = p5.createVector(...this.position).sub(referencePoint.copy());
-    // .normalize();
+    const N = normalCalc([face[0], face[1], centroid], p5).normalize();
+    const L = p5
+      .createVector(...this.position)
+      .sub(referencePoint.copy())
+      .normalize();
+
+    // Se n * l > 0 calcula especular e specular só existe se R * S > 0
+
     const R = N.copy().sub(L).mult(L.copy().mult(2).dot(N)); // (2L * N) * N - L
     const S = p5
       .createVector(observer[0], observer[1], observer[2])
       .sub(referencePoint);
 
-    const Fatt = Math.min(
-      1 /
-        p5.dist(
-          face[0][0],
-          face[0][1],
-          face[0][2],
-          this.position[0],
-          this.position[1],
-          this.position[2]
-        ),
-      1
-    );
+    const Fatt = 1;
+    // const Fatt = Math.min(
+    //   1 /
+    //     // Math.pow(
+    //     p5.dist(
+    //       referencePoint.x,
+    //       referencePoint.y,
+    //       referencePoint.z,
+    //       this.position[0],
+    //       this.position[1],
+    //       this.position[2]
+    //     ),
+    //   // 2
+    //   // ),
+    //   1
+    // );
 
     const ItR =
       Ka[0] * this.Ila[0] +
@@ -84,7 +91,7 @@ export class Light {
       Math.max(...face.map(([, , z]) => z)),
     ];
 
-    return [(x[1] - x[0]) / 2, (y[1] - y[0]) / 2, (z[1] - z[0]) / 2];
+    return [(x[1] + x[0]) / 2, (y[1] + y[0]) / 2, (z[1] + z[0]) / 2];
   }
 
   setPosition(position: number[]) {

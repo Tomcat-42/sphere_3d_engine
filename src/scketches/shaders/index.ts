@@ -3,29 +3,64 @@ export const oneColorVert = `
 precision mediump float;
 #endif
 
-// Transformation matrices
- uniform mat4 uModelViewMatrix;
- uniform mat4 uProjectionMatrix;
-
-uniform vec2 uScreenSize;
+uniform mat4 uModelViewMatrix;
+uniform mat4 uProjectionMatrix;
 
 attribute vec3 aPosition;
-// P5 provides us with texture coordinates for most shapes
-attribute vec2 aTexCoord;
 
-// This is a varying variable, which in shader terms means that it will be passed from the vertex shader to the fragment shader
-varying vec2 vTexCoord;
+// ======================================================= //
+
+// // vetores | pontos
+// uniform vec4 uFaceNormal;
+// uniform vec4 uObserver;
+// uniform vec4 uLightPosition;
+// uniform vec4 uReferencePoint;
+
+// // ratios
+// uniform vec3 uKa;
+// uniform vec3 uKd;
+// uniform vec3 uKs;
+// uniform float uN;
+
+// uniform vec3 uIla;
+// uniform vec3 uIl;
+
+// varying vec3 vFinalColor;
+
+vec3 getLightColor(
+  vec3 normal, 
+  vec3 lightPosition, 
+  vec3 referencePoint, 
+  vec3 observerPosition,
+  vec3 Ka,
+  vec3 Kd,
+  vec3 Ks,
+  vec3 Ila,
+  vec3 Il,
+  float n
+  ) {
+  vec3 N = normalize(normal);
+  vec3 L = normalize(lightPosition - referencePoint);
+  
+  vec3 R = normalize( reflect(-L, N) );
+  vec3 S = normalize(observerPosition - referencePoint);
+  
+  float ndotl = max(dot(N, L), 0.0);
+  float rdots = max(dot(R, S), 0.0);
+  
+  return (Ka * Ila + Il * (Kd * ndotl + Ks * pow(rdots,n)))/255.0;
+}
 
 void main() {
-  // Copy the texcoord attributes into the varying variable
-  vTexCoord = aTexCoord;
-  
-  vec4 normalizedPosition = vec4(aPosition, 1.0);
-    
-  // doing .xy means we do the same math for both x and y positions
-
-  vec4 viewModelPosition = uModelViewMatrix * normalizedPosition;
+  vec4 viewModelPosition = uModelViewMatrix * vec4(aPosition, 1.0);
   gl_Position = uProjectionMatrix * viewModelPosition;
+  
+  // vFinalColor = getLightColor(
+  //   vec3(uFaceNormal),
+  //   vec3(uLightPosition), 
+  //   vec3(uReferencePoint),
+  //   vec3(uObserver)
+  // );
 }
 `;
 
@@ -33,8 +68,6 @@ export const oneColorFrag = `
 #ifdef GL_ES
 precision mediump float;
 #endif
-
-// uniform vec3 uColor;
 
 // vetores | pontos
 uniform vec4 uFaceNormal;
@@ -46,44 +79,52 @@ uniform vec4 uReferencePoint;
 uniform vec3 uKa;
 uniform vec3 uKd;
 uniform vec3 uKs;
-uniform float n;
+uniform float uN;
+
 uniform vec3 uIla;
 uniform vec3 uIl;
 
+// varying vec3 vFinalColor;
+
+vec3 getLightColor(
+  vec3 normal, 
+  vec3 lightPosition, 
+  vec3 referencePoint, 
+  vec3 observerPosition,
+  vec3 Ka,
+  vec3 Kd,
+  vec3 Ks,
+  vec3 Ila,
+  vec3 Il,
+  float n
+  ) {
+  vec3 N = normalize(normal);
+  vec3 L = normalize(lightPosition - referencePoint);
+  
+  vec3 R = normalize( reflect(-L, N) );
+  vec3 S = normalize(observerPosition - referencePoint);
+  
+  float ndotl = max(dot(N, L), 0.0);
+  float rdots = max(dot(R, S), 0.0);
+  
+  return (Ka * Ila + Il * (Kd * ndotl + Ks * pow(rdots,n)))/255.0;
+}
+
 void main()
 {
-  vec4 N = uFaceNormal;
-  vec4 L = uLightPosition - uReferencePoint;
-  
-  float Fatt = min(
-    1.0/distance(
-      vec3(uReferencePoint), vec3(uLightPosition)
-    ),
-    1.0
+  vec3 vFinalColor = getLightColor(
+    vec3(uFaceNormal),
+    vec3(uLightPosition), 
+    vec3(uReferencePoint),
+    vec3(uObserver),
+    uKa,
+    uKd,
+    uKs,
+    uIla,
+    uIl,
+    uN
   );
-  
-  float itR = 
-  (uKa[0] * uIla[0] + Fatt * uIl[0] * (uKd[0] * dot(vec3(N), vec3(L))))/255.0;
-  
-  float itG = 
-  (uKa[1] * uIla[1] + Fatt * uIl[1] * (uKd[1] * dot(vec3(N), vec3(L) )))/255.0;
-  
-  float itB = 
-  (uKa[2] * uIla[2] + Fatt * uIl[2] * (uKd[2] * dot(vec3(N), vec3(L) )))/255.0;
-  
-  gl_FragColor = vec4(itR, itG, itB, 1.0);
+
+  gl_FragColor = vec4(vFinalColor,1.0);
 }
 `;
-
-// export const oneColorFrag = `
-// #ifdef GL_ES
-// precision mediump float;
-// #endif
-
-// uniform vec3 uColor;
-
-// void main()
-// {
-//   gl_FragColor = vec4(uColor, 1.0);
-// }
-// `;

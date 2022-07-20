@@ -1,3 +1,4 @@
+import * as math from "mathjs";
 import nj from "numjs";
 import p5Types from "p5";
 
@@ -43,6 +44,8 @@ export class Camera {
   public near: number;
   public far: number;
 
+  private concatenatedMatrix: math.Matrix = math.matrix();
+
   constructor({
     camPosition,
     p5,
@@ -86,6 +89,7 @@ export class Camera {
       this.window.width[0],
       this.window.width[1]
     );
+    this.setConcatenedMatrix();
   }
 
   private defineNVector(vrp: number[], lookingAt: number[]): number[] {
@@ -245,11 +249,20 @@ export class Camera {
   }
 
   public updateP(x: number, y: number, z: number) {
-    console.debug("p: ", this.p);
-
     this.p[0] = this.p[0] + x;
     this.p[1] = this.p[1] + y;
 
     this.generateCanonicalBase(this.vrp, this.p);
+  }
+
+  public setConcatenedMatrix() {
+    this.concatenatedMatrix = math.multiply(
+      math.multiply(math.matrix(this.Mjp), math.matrix(this.projectionMatrix)),
+      math.matrix(this.Msrusrc)
+    );
+  }
+
+  public getConcatenatedMatrix(): math.Matrix {
+    return this.concatenatedMatrix;
   }
 }
