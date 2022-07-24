@@ -122,7 +122,7 @@ export const SphereTab: FC<SphereTabProps> = ({
               <Slider
                 min={0}
                 max={360}
-                step={0.5}
+                step={5}
                 onChange={(value) => {
                   setRotateX(value);
                   rotateSelectedObject("x", value - rotateX);
@@ -133,7 +133,7 @@ export const SphereTab: FC<SphereTabProps> = ({
               <Slider
                 min={0}
                 max={360}
-                step={0.5}
+                step={5}
                 onChange={(value) => {
                   setRotateY(value);
                   rotateSelectedObject("y", value - rotateY);
@@ -144,7 +144,7 @@ export const SphereTab: FC<SphereTabProps> = ({
               <Slider
                 min={0}
                 max={360}
-                step={0.5}
+                step={5}
                 onChange={(value) => {
                   setRotateZ(value);
                   rotateSelectedObject("z", value - rotateZ);

@@ -2,6 +2,7 @@ import { ClearOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Layout, Row, Tabs, Tooltip, Typography } from "antd";
 import { useState } from "react";
 import { CameraTab } from "./components/CameraTab";
+import { GithubCorner } from "./components/GithubCorner";
 import { LightTab } from "./components/LightTab";
 import { CreateSphereModal } from "./components/SphereModal";
 import { SphereTab } from "./components/SphereTab";
@@ -40,6 +41,7 @@ export const App = () => {
         id="mainCanvas"
         style={{
           boxSizing: "border-box",
+          position: "relative",
           margin: "auto",
           display: "flex",
           justifyContent: "center",
@@ -47,6 +49,12 @@ export const App = () => {
           alignItems: "center",
         }}
       >
+        <GithubCorner
+          link="https://github.com/Tomcat-42/sphere_3d_engine"
+          width={50}
+          height={50}
+          svgBackground="#252525"
+        />
         <ShaderedScketch />
       </Content>
       <Sider

@@ -7,8 +7,8 @@ export const LightTab = () => {
     <>
       <ShadingType />
       <RotateLight />
-      <LightPosition />
       <AmbientLight />
+      <LightPosition />
       <CommomLight />
     </>
   );
@@ -169,7 +169,7 @@ const LightPosition = () => {
   return (
     <>
       <Typography.Title style={{ marginTop: "1rem" }} level={4}>
-        Position:
+        Light Position:
       </Typography.Title>
       <Row gutter={6}>
         <Col span={8}>
