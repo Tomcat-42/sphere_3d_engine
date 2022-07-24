@@ -4,7 +4,7 @@ App created for final work to the Computer Graphics discipline.
 The app has the objective of implementing a generator of spheres, using its camera, lighting, and coordinates system.
 
 Spheres are generated for a set of meridians and parallels, as shown in the image
-<div width="100%" justifyContent="center" alignItems="center">
+<div align="center">
   <img src="./images/sphere.png"/>
   <img src="./images/parallels.png"/>
 </div>
@@ -61,7 +61,7 @@ If you want to play with the app, you can run it locally in development mode, ru
 Is possible to configure all parameters of the camera, light, and spheres. 
 Each of these configurations is accessible in a bar on the right sidebar.
 
-<div width="100%" justifyContent="center" alignItems="center">
+<div align="center">
   <img src="./images/config-bar.png"/>
 </div>
 
@@ -70,7 +70,7 @@ Each of these configurations is accessible in a bar on the right sidebar.
 In the bottom right side of the screen are two buttons, one to clean the scene and another to add a new Sphere. 
 There are a fell default values if you don't know which to define.
 
-<div width="100%" justifyContent="center" alignItems="center">
+<div align="center">
   <img src="./images/buttons.png"/>
 </div>
 
@@ -78,21 +78,21 @@ There are a fell default values if you don't know which to define.
 In the Sphere configurations section is possible to select a sphere in the scene (see by the sphere name).
 After select one, is possible to apply any **Geometric Transformation**.
 
-<div width="100%" justifyContent="center" alignItems="center">
+<div align="center">
   <img src="./images/sphere-section.png"/>
 </div>
 
 ### Camera actions
 In the camera is possible to change all its params, but the **VRP** can be changes using **keybord actions**:
 
-**W** - Increment **Y** coordinante $\\$
-**S** - Decrement **Y** coordinante $\\$
-**D** - Increment **X** coordinante $\\$
-**A** - Decrement **X** coordinante $\\$
-**E** - Increment **Z** coordinante $\\$
-**Q** - Decrement **Z** coordinante $\\$
+**W** - Increment **Y** coordinante <br/>
+**S** - Decrement **Y** coordinante <br/>
+**D** - Increment **X** coordinante <br/>
+**A** - Decrement **X** coordinante <br/>
+**E** - Increment **Z** coordinante <br/>
+**Q** - Decrement **Z** coordinante <br/>
 
-<div width="100%" justifyContent="center" alignItems="center">
+<div align="center">
   <img src="./images/camera-section.png"/>
 </div>
 
@@ -100,7 +100,7 @@ In the camera is possible to change all its params, but the **VRP** can be chang
 Exists a **Global Light**, and a **point light**.
 Exists a Global Light, and a point light. For Global Light, you can change its intensity and for the Point Light you can change its intensity and its position. In addition, it is possible to rotate the light around an axis. This rotation is done by 1 degree every frame.
 
-<div width="100%" justifyContent="center" alignItems="center">
+<div align="center">
   <img src="./images/light-section.png"/>
 </div>
 
