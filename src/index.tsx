@@ -16,8 +16,7 @@ root.render(
     <ShaderSceneContextProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/shader" element={<ShaderedApp />} />
+          <Route path="/" element={<ShaderedApp />} />
         </Routes>
       </BrowserRouter>
     </ShaderSceneContextProvider>

@@ -114,7 +114,7 @@ export const ShaderSceneContextProvider = ({
     120, 120, 120,
   ]);
   const [axisToRotate, setAxisToRotate] = useState<"x" | "y" | "z">("y");
-  const [isToRotateLight, setIsToRotateLight] = useState<boolean>(false);
+  const [isToRotateLight, setIsToRotateLight] = useState<boolean>(true);
 
   const [shader, setShader] = useState<p5Types.Shader>({} as p5Types.Shader);
 

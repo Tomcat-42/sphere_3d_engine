@@ -29,6 +29,7 @@ export const CameraTab: FC = () => {
 
 const ViewUp = () => {
   const { viewUp, setViewUp } = useSceneContext();
+
   return (
     <>
       <Typography.Title style={{ marginTop: "1rem" }} level={4}>

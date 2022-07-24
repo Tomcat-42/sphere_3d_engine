@@ -109,19 +109,23 @@ export const ShaderedScketch = () => {
     setCameraVrpInterface(myCamera.vrp);
   };
 
-  const draw = (p5: p5Types) => {
-    p5.background(40);
-
-    if (p5.keyIsPressed) moveCamera(myCamera, p5.keyCode);
-
+  const drawLightPoint = (p5: p5Types) => {
     p5.push();
     if (isToRotateLight)
       light.setPosition(GT.rotate(1, [[...light.position]], axisToRotate)[0]);
-    const yes = pipe(myCamera, [[...light.position]]);
+    const point = pipe(myCamera, [[...light.position]]);
     p5.stroke(light.Il[0], light.Il[1], light.Il[2]);
-    p5.translate(yes.get([0, 0]), yes.get([1, 0]), yes.get([2, 0]));
+    p5.translate(point.get([0, 0]), point.get([1, 0]), point.get([2, 0]));
     p5.sphere(5);
     p5.pop();
+  };
+
+  const draw = (p5: p5Types) => {
+    p5.background(0);
+
+    if (p5.keyIsPressed) moveCamera(myCamera, p5.keyCode);
+
+    drawLightPoint(p5);
 
     sceneObjects.forEach((sphere) => {
       const distance = p5

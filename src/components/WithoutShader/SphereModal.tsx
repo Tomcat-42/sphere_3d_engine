@@ -1,6 +1,10 @@
-import { Col, Form, Input, InputNumber, Modal, Row, Typography } from "antd";
+import { Col, Form, Input, InputNumber, Modal, Row } from "antd";
 import { useSceneContext } from "../../contexts/Scene";
-import { Sphere, SphereConstructorType, SphereType } from "../../objects/Sphere";
+import {
+  Sphere,
+  SphereConstructorType,
+  SphereType,
+} from "../../objects/Sphere";
 
 export const CreateSphereModal = ({
   defaultSphere,
@@ -251,7 +255,7 @@ export const CreateSphereModal = ({
               name="KsR"
               label="R"
               rules={[{ required: true }]}
-              initialValue={isToEditSphere ? defaultSphere?.Ks[0] : 0}
+              initialValue={isToEditSphere ? defaultSphere?.Ks[0] : 0.3}
             >
               <InputNumber
                 min={0}
@@ -294,7 +298,7 @@ export const CreateSphereModal = ({
           )
         </Row>
         <Row gutter={16}>
-          <Col span={24}>
+          <Col span={12}>
             <Form.Item
               name="name"
               label="Sphere Name"
@@ -308,16 +312,16 @@ export const CreateSphereModal = ({
               <Input />
             </Form.Item>
           </Col>
-          {/* <Col span={12}>
+          <Col span={12}>
             <Form.Item
-              name="color"
-              label="Color"
+              name="n"
+              label="Shadiness"
+              initialValue={defaultSphere ? defaultSphere?.n : 32}
               rules={[{ required: true }]}
-              initialValue={isToEditSphere ? defaultSphere?.color : "#00ff00"}
             >
-              <input style={{ width: "100%" }} type="color" />
+              <InputNumber style={{ width: "100%" }} controls={false} min={1} />
             </Form.Item>
-          </Col> */}
+          </Col>
         </Row>
       </Form>
     </Modal>

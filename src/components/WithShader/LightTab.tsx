@@ -98,7 +98,8 @@ const CommomLight = () => {
 };
 
 const AmbientLight = () => {
-  const { ambientLightIntensity, setAmbientLightIntensity } = useShaderSceneContext();
+  const { ambientLightIntensity, setAmbientLightIntensity } =
+    useShaderSceneContext();
 
   return (
     <>
@@ -242,8 +243,6 @@ const ShadingType = () => {
         style={{ width: "100%" }}
       >
         <Option value={"flat"}>Flat Shading</Option>
-        <Option value={"gouraud"}>Gouraud</Option>
-        <Option value={"phong"}>Phong</Option>
       </Select>
     </>
   );

@@ -27,52 +27,48 @@ export class Light {
     n: number,
     p5: p5Types
   ): number[] {
-    const centroid = this.getCentroid(face); // FIXME: Centroid is not correct
+    const centroid = this.getCentroid(face);
     const referencePoint = p5.createVector(
       centroid[0],
       centroid[1],
       centroid[2]
     );
 
-    const N = normalCalc([face[0], face[1], centroid], p5).normalize();
+    const N = normalCalc([face[1], centroid, face[0]], p5).normalize();
     const L = p5
       .createVector(...this.position)
       .sub(referencePoint.copy())
       .normalize();
 
-    // Se n * l > 0 calcula especular e specular só existe se R * S > 0
+    const NdotL = N.dot(L);
+    let RdotS = 0.0;
 
-    const R = N.copy().sub(L).mult(L.copy().mult(2).dot(N)); // (2L * N) * N - L
-    const S = p5
-      .createVector(observer[0], observer[1], observer[2])
-      .sub(referencePoint);
+    const minusL = L.copy().mult(-1);
+
+    if (NdotL > 0.00000001) {
+      const R = N.copy()
+        .mult(minusL.copy().mult(2).dot(N.copy()))
+        .sub(minusL.copy())
+        .normalize();
+      const S = p5
+        .createVector(observer[0], observer[1], observer[2])
+        .sub(referencePoint)
+        .normalize();
+
+      RdotS = R.dot(S);
+    }
 
     const Fatt = 1;
-    // const Fatt = Math.min(
-    //   1 /
-    //     // Math.pow(
-    //     p5.dist(
-    //       referencePoint.x,
-    //       referencePoint.y,
-    //       referencePoint.z,
-    //       this.position[0],
-    //       this.position[1],
-    //       this.position[2]
-    //     ),
-    //   // 2
-    //   // ),
-    //   1
-    // );
 
     const ItR =
       Ka[0] * this.Ila[0] +
-      Fatt * this.Il[0] * (Kd[0] * N.dot(L) + Ks[0] * Math.pow(R.dot(S), n));
+      Fatt * this.Il[0] * (Kd[0] * NdotL + Ks[0] * Math.pow(RdotS, n));
     const ItG =
       Ka[1] * this.Ila[1] +
-      Fatt * this.Il[1] * (Kd[1] * N.dot(L) + Ks[1] * Math.pow(R.dot(S), n));
+      Fatt * this.Il[1] * (Kd[1] * NdotL + Ks[1] * Math.pow(RdotS, n));
     const ItB =
       Ka[2] * this.Ila[2] +
-      Fatt * this.Il[2] * (Kd[2] * N.dot(L) + Ks[2] * Math.pow(R.dot(S), n));
+      Fatt * this.Il[2] * (Kd[2] * NdotL + Ks[2] * Math.pow(RdotS, n));
 
     return [ItR, ItG, ItB];
   }

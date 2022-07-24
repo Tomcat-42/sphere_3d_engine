@@ -157,7 +157,7 @@ export const CreateSphereModal = ({
               name="KaR"
               label="R"
               rules={[{ required: true }]}
-              initialValue={isToEditSphere ? defaultSphere?.Ka[0] : 0.1}
+              initialValue={isToEditSphere ? defaultSphere?.Ka[0] : 0.0}
             >
               <InputNumber
                 min={0}
@@ -172,7 +172,7 @@ export const CreateSphereModal = ({
               name="KaG"
               label="G"
               rules={[{ required: true }]}
-              initialValue={isToEditSphere ? defaultSphere?.Ka[1] : 0.1}
+              initialValue={isToEditSphere ? defaultSphere?.Ka[1] : 0.0}
             >
               <InputNumber
                 min={0}
@@ -187,7 +187,7 @@ export const CreateSphereModal = ({
               name="KaB"
               label="B"
               rules={[{ required: true }]}
-              initialValue={isToEditSphere ? defaultSphere?.Ka[2] : 0.1}
+              initialValue={isToEditSphere ? defaultSphere?.Ka[2] : 0.3}
             >
               <InputNumber
                 min={0}
@@ -206,7 +206,7 @@ export const CreateSphereModal = ({
               name="KdR"
               label="R"
               rules={[{ required: true }]}
-              initialValue={isToEditSphere ? defaultSphere?.Kd[0] : 0.3}
+              initialValue={isToEditSphere ? defaultSphere?.Kd[0] : 0.0}
             >
               <InputNumber
                 min={0}
@@ -236,7 +236,7 @@ export const CreateSphereModal = ({
               name="KdB"
               label="B"
               rules={[{ required: true }]}
-              initialValue={isToEditSphere ? defaultSphere?.Kd[2] : 0.3}
+              initialValue={isToEditSphere ? defaultSphere?.Kd[2] : 0.0}
             >
               <InputNumber
                 min={0}

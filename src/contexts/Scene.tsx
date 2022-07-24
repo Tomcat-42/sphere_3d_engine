@@ -69,7 +69,7 @@ export const SceneContextProvider = ({ children }: { children: ReactNode }) => {
 
   const [myCamera, setMyCamera] = useState<Camera>({} as Camera);
   const [cameraVrpInterface, setCameraVrpInterface] = useState<number[]>([
-    0, 0, 100,
+    0, 0, 400,
   ]);
   const [camP, setLocalCamP] = useState<number[]>([0, 0, 0]);
   const [windowSize, setLocalWindowSize] = useState<WindowType>({
@@ -98,16 +98,16 @@ export const SceneContextProvider = ({ children }: { children: ReactNode }) => {
 
   const [light, setLight] = useState<Light>({} as Light);
   const [lightPosition, setLocalLightPosition] = useState<number[]>([
-    -80, 0, 0, 1,
+    -80, 0, -100, 1,
   ]);
   const [ambientLightIntensity, setLocalAmbientLightIntensity] = useState<
     number[]
-  >([255, 255, 255]);
+  >([50, 50, 50]);
   const [lightIntensity, setLocalLightIntensity] = useState<number[]>([
-    255, 255, 255,
+    120, 120, 120,
   ]);
   const [axisToRotate, setAxisToRotate] = useState<"x" | "y" | "z">("y");
-  const [isToRotateLight, setIsToRotateLight] = useState<boolean>(false);
+  const [isToRotateLight, setIsToRotateLight] = useState<boolean>(true);
 
   const setDrawMode = (newDrawMode: drawModeEnum) => {
     myCamera.setProjectionMatrix(newDrawMode);

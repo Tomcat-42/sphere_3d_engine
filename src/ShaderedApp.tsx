@@ -62,7 +62,7 @@ export const ShaderedApp = () => {
         <Typography.Title level={2} style={{ textAlign: "center" }}>
           Sphere Generator
         </Typography.Title>
-        <Tabs style={{ color: "white" }}>
+        <Tabs defaultActiveKey="3" style={{ color: "white" }}>
           <TabPane tab="Spheres" key="1">
             <SphereTab
               setDefaultSphere={setDefaultSphere}

@@ -7,6 +7,7 @@ import { Light } from "../objects/Light";
 import { GT } from "../utils/GT";
 import { pipe } from "../utils/pipe";
 import { drawAxonometricFace } from "../utils/withoutShader/drawAxonometricFace";
+import { drawFace } from "../utils/withoutShader/drawFace";
 import { drawPerspectiveFace } from "../utils/withoutShader/drawPerspectiveFace";
 
 export const P5Interface = () => {
@@ -143,13 +144,11 @@ export const P5Interface = () => {
           sphere.Ka,
           sphere.Kd,
           sphere.Ks,
-          2,
+          sphere.n,
           p5
         );
         const isSelected = selectedSphereId === sphere.id;
-        if (drawMode === drawModeEnum.perspective)
-          drawPerspectiveFace(myCamera, face, color, isSelected, p5);
-        else drawAxonometricFace(p5, face, color, isSelected, myCamera);
+        drawFace(p5, face, isSelected, myCamera, color, drawMode);
       });
     });
   };

@@ -9,6 +9,7 @@ export const drawFace = (
   face: number[][],
   isSelected: boolean,
   camera: Camera,
+  color: number[],
   drawMode: drawModeEnum
 ) => {
   const localFace = JSON.parse(JSON.stringify(face));
@@ -42,12 +43,12 @@ export const drawFace = (
     p5.stroke("yellow");
     p5.strokeWeight(1);
   } else p5.strokeWeight(0);
-
+p5.fill(color);
   p5.beginShape();
 
   for (let i = 0; i < pointsMatrix.size()[1]; i++) {
-    const point = math.subset(pointsMatrix, math.index(math.range(0, 3), i));
-    p5.vertex(point.get([0, 0]), point.get([1, 0]), point.get([2, 0]));
+    const yes = math.subset(pointsMatrix, math.index(math.range(0, 3), i));
+    p5.vertex(yes.get([0, 0]), yes.get([1, 0]), yes.get([2, 0]));
   }
 
   p5.endShape(p5.CLOSE);
