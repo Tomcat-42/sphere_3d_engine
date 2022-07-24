@@ -1,5 +1,4 @@
 import nj from "numjs";
-import p5Types from "p5";
 import { v4 } from "uuid";
 import { GT } from "../utils/GT";
 
@@ -38,9 +37,6 @@ export type SphereType = {
   vertices: number[][][];
   faces: number[][][];
   updateData: (data: UpdateSphereType) => void;
-  drawVertices: (p5: p5Types) => void;
-  drawEdges: (p5: p5Types) => void;
-  drawFaces: (p5: p5Types) => void;
   translate: (dx: number, dy: number, dz: number) => void;
   scale: (sx: number, sy: number, sz: number) => void;
   rotate: (angle: number, axis: string) => void;
@@ -202,92 +198,6 @@ export class Sphere {
       }
     }
     this.faces = faces;
-  }
-
-  public drawVertices(p5: p5Types) {
-    const flattenVertices = this.vertices.flat();
-
-    p5.push();
-    p5.stroke("yellow");
-    p5.strokeWeight(5);
-
-    p5.point(this.meridiansEnd[0], this.meridiansEnd[1], this.meridiansEnd[2]);
-    flattenVertices.forEach((vertex: number[]) => {
-      p5.point(vertex[0], vertex[1], vertex[2]);
-    });
-    p5.point(
-      this.meridiansBegin[0],
-      this.meridiansBegin[1],
-      this.meridiansBegin[2]
-    );
-    p5.pop();
-  }
-
-  public drawFaces(p5: p5Types) {
-    p5.push();
-
-    p5.noStroke();
-    p5.stroke("black");
-    p5.strokeWeight(1);
-    p5.fill(this.color);
-
-    this.faces.forEach((face: number[][]) => {
-      p5.beginShape();
-      face.forEach((vertexIdx: number[]) => {
-        p5.vertex(
-          this.vertices[vertexIdx[0]][vertexIdx[1]][0],
-          this.vertices[vertexIdx[0]][vertexIdx[1]][1],
-          this.vertices[vertexIdx[0]][vertexIdx[1]][2]
-        );
-      });
-      p5.endShape(p5.CLOSE);
-    });
-
-    p5.pop();
-  }
-
-  public drawEdges(p5: p5Types) {
-    const extremes = [this.meridiansEnd, this.meridiansBegin];
-    for (let i = 0; i < 2; i++) {
-      const currentParallel = this.vertices[i * (this.parallelsAmount - 1)];
-
-      p5.push();
-      p5.stroke(this.color);
-      currentParallel.forEach((currrentPoint: number[]) => {
-        p5.line(
-          currrentPoint[0],
-          currrentPoint[1],
-          currrentPoint[2],
-          extremes[i][0],
-          extremes[i][1],
-          extremes[i][2]
-        );
-      });
-    }
-    this.vertices.forEach((line: any, i: number) => {
-      line.forEach((point: [number, number, number], j: number) => {
-        const nextParallelPoint: any =
-          this.vertices[i][(j + 1) % this.meridiansAmout];
-        const nextMeridianPoint: any =
-          i === this.parallelsAmount - 1
-            ? this.vertices[i][j]
-            : this.vertices[i + 1][j];
-
-        p5.line(
-          ...point,
-          nextParallelPoint[0],
-          nextParallelPoint[1],
-          nextParallelPoint[2]
-        );
-        p5.line(
-          nextMeridianPoint[0],
-          nextMeridianPoint[1],
-          nextMeridianPoint[2],
-          ...point
-        );
-      });
-    });
-    p5.pop();
   }
 
   public translate(dx: number, dy: number, dz: number) {

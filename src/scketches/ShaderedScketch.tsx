@@ -4,10 +4,9 @@ import { DirectionEnum } from "../constants";
 import { useShaderSceneContext } from "../contexts/ShaderScene";
 import { Camera } from "../objects/Camera";
 import { Light } from "../objects/Light";
+import { drawFace } from "../utils/drawFace";
 import { GT } from "../utils/GT";
-import { normalCalc } from "../utils/normalCalc";
-import { pipe } from "../utils/pipe";
-import { drawFace } from "../utils/withShader/drawFace";
+import { getCentroid, multiplySceneMetrices, normalCalc } from "../utils/math";
 import { oneColorFrag, oneColorVert } from "./shaders";
 
 export const ShaderedScketch = () => {
@@ -51,7 +50,7 @@ export const ShaderedScketch = () => {
     });
   };
 
-  const setup = (p5: p5Types, parent: Element) => {
+  const setup = (p5: p5Types) => {
     const element = document.getElementById("mainCanvas");
     const initialSize = [
       element?.clientWidth || window.innerWidth,
@@ -92,8 +91,6 @@ export const ShaderedScketch = () => {
     const localShader = p5.createShader(oneColorVert, oneColorFrag);
     p5.shader(localShader);
     setShader(localShader);
-
-    p5.debugMode(p5.AXES);
   };
 
   const moveCamera = (camera: Camera, keyCode: number) => {
@@ -109,11 +106,56 @@ export const ShaderedScketch = () => {
     setCameraVrpInterface(myCamera.vrp);
   };
 
+  const drawGizmo = (p5: p5Types) => {
+    p5.push();
+    const gizmoCenter = [0, 0, 0];
+    const gizmoX = [gizmoCenter[0] + 20, gizmoCenter[1], gizmoCenter[2]];
+    const gizmoY = [gizmoCenter[0], gizmoCenter[1] + 20, gizmoCenter[2]];
+    const gizmoZ = [gizmoCenter[0], gizmoCenter[1], gizmoCenter[2] + 20];
+
+    const camCenter = multiplySceneMetrices(myCamera, [[...gizmoCenter, 1]]);
+    const camX = multiplySceneMetrices(myCamera, [[...gizmoX, 1]]);
+    const camY = multiplySceneMetrices(myCamera, [[...gizmoY, 1]]);
+    const camZ = multiplySceneMetrices(myCamera, [[...gizmoZ, 1]]);
+
+    p5.translate((-p5.width / 5) * 2, (-p5.height / 5) * 2);
+
+    p5.strokeWeight(2);
+    p5.stroke(255, 0, 0);
+    p5.line(
+      camCenter.get([0, 0]),
+      camCenter.get([1, 0]),
+      gizmoCenter[0],
+      camX.get([0, 0]),
+      camX.get([1, 0]),
+      gizmoX[2]
+    );
+    p5.stroke(0, 255, 0);
+    p5.line(
+      camCenter.get([0, 0]),
+      camCenter.get([1, 0]),
+      gizmoCenter[0],
+      camY.get([0, 0]),
+      camY.get([1, 0]),
+      gizmoY[2]
+    );
+    p5.stroke(0, 0, 255);
+    p5.line(
+      camCenter.get([0, 0]),
+      camCenter.get([1, 0]),
+      gizmoCenter[0],
+      camZ.get([0, 0]),
+      camZ.get([1, 0]),
+      gizmoZ[2]
+    );
+    p5.pop();
+  };
+
   const drawLightPoint = (p5: p5Types) => {
     p5.push();
     if (isToRotateLight)
       light.setPosition(GT.rotate(1, [[...light.position]], axisToRotate)[0]);
-    const point = pipe(myCamera, [[...light.position]]);
+    const point = multiplySceneMetrices(myCamera, [[...light.position]]);
     p5.stroke(light.Il[0], light.Il[1], light.Il[2]);
     p5.translate(point.get([0, 0]), point.get([1, 0]), point.get([2, 0]));
     p5.sphere(5);
@@ -126,6 +168,7 @@ export const ShaderedScketch = () => {
     if (p5.keyIsPressed) moveCamera(myCamera, p5.keyCode);
 
     drawLightPoint(p5);
+    drawGizmo(p5);
 
     sceneObjects.forEach((sphere) => {
       const distance = p5
@@ -152,7 +195,7 @@ export const ShaderedScketch = () => {
         ]);
         shader.setUniform("uObserver", [...myCamera.vrp]);
         shader.setUniform("uLightPosition", [...light.position]);
-        shader.setUniform("uReferencePoint", [...light.getCentroid(face)]);
+        shader.setUniform("uReferencePoint", [...getCentroid(face)]);
         shader.setUniform("uKa", sphere.Ka);
         shader.setUniform("uKd", sphere.Kd);
         shader.setUniform("uKs", sphere.Ks);

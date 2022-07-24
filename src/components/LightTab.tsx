@@ -1,5 +1,5 @@
 import { Checkbox, Col, InputNumber, Row, Select, Typography } from "antd";
-import { useShaderSceneContext } from "../../contexts/ShaderScene";
+import { useShaderSceneContext } from "../contexts/ShaderScene";
 const { Option } = Select;
 
 export const LightTab = () => {

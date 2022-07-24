@@ -1,8 +1,8 @@
 import * as math from "mathjs";
 import p5Types from "p5";
-import { drawModeEnum } from "../../contexts/Scene";
-import { Camera } from "../../objects/Camera";
-import { normalCalc } from "../normalCalc";
+import { drawModeEnum, error } from "../constants";
+import { Camera } from "../objects/Camera";
+import { normalCalc } from "./math";
 
 export const drawFace = (
   p5: p5Types,
@@ -16,7 +16,7 @@ export const drawFace = (
 
   const angle = p5.createVector(...camera.nVector).dot(normal);
 
-  if (angle < 0.00000001) return;
+  if (angle < error) return;
 
   const concatenedPipeMatrices = camera.getConcatenatedMatrix();
 

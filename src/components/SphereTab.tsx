@@ -10,8 +10,8 @@ import {
   Typography,
 } from "antd";
 import { FC, useState } from "react";
-import { useSceneContext } from "../../contexts/Scene";
-import { SphereType } from "../../objects/Sphere";
+import { useShaderSceneContext } from "../contexts/ShaderScene";
+import { SphereType } from "../objects/Sphere";
 const { Panel } = Collapse;
 const { Option } = Select;
 
@@ -31,7 +31,7 @@ export const SphereTab: FC<SphereTabProps> = ({
     translateSelectedObject,
     scaleSelectedObject,
     rotateSelectedObject,
-  } = useSceneContext();
+  } = useShaderSceneContext();
 
   const [translateX, setTranslateX] = useState<number>(1);
   const [translateY, setTranslateY] = useState<number>(1);

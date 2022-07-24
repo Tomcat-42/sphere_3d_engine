@@ -1,13 +1,9 @@
+import p5Types from "p5";
 import { createContext, ReactNode, useContext, useState } from "react";
+import { drawModeEnum } from "../constants";
 import { Camera, WindowType } from "../objects/Camera";
 import { Light } from "../objects/Light";
 import { SphereType } from "../objects/Sphere";
-import p5Types from "p5";
-
-enum drawModeEnum {
-  perspective = "perspective",
-  axonometric = "axonometric",
-}
 
 type ShaderSceneContextType = {
   sceneObjects: SphereType[];
@@ -84,7 +80,7 @@ export const ShaderSceneContextProvider = ({
     height: [-150, 150],
   });
   const [camNear, setLocalCamNear] = useState<number>(20);
-  const [camFar, setLocalCamFar] = useState<number>(1000);
+  const [camFar, setLocalCamFar] = useState<number>(10000);
   const projectionType = {
     [drawModeEnum.perspective]: {
       value: drawModeEnum.perspective,

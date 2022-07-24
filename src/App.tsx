@@ -1,18 +1,18 @@
 import { ClearOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Collapse, Layout, Row, Tabs, Tooltip, Typography } from "antd";
+import { Button, Layout, Row, Tabs, Tooltip, Typography } from "antd";
 import { useState } from "react";
-import { CameraTab } from "./components/WithoutShader/CameraTab";
-import { LightTab } from "./components/WithoutShader/LightTab";
-import { CreateSphereModal } from "./components/WithoutShader/SphereModal";
-import { SphereTab } from "./components/WithoutShader/SphereTab";
-import { useSceneContext } from "./contexts/Scene";
+import { CameraTab } from "./components/CameraTab";
+import { LightTab } from "./components/LightTab";
+import { CreateSphereModal } from "./components/SphereModal";
+import { SphereTab } from "./components/SphereTab";
+import { useShaderSceneContext } from "./contexts/ShaderScene";
 import { SphereType } from "./objects/Sphere";
-import { P5Interface } from "./scketches/P5Interface";
+import { ShaderedScketch } from "./scketches/ShaderedScketch";
 const { Sider, Content } = Layout;
 const { TabPane } = Tabs;
 
-function App() {
-  const { setSelectedSphereId, clearInterface } = useSceneContext();
+export const App = () => {
+  const { setSelectedSphereId, clearInterface } = useShaderSceneContext();
 
   const [createSphereModalVisible, setCreateSphereModalVisible] =
     useState(false);
@@ -47,21 +47,19 @@ function App() {
           alignItems: "center",
         }}
       >
-        <P5Interface />
+        <ShaderedScketch />
       </Content>
       <Sider
+        width="240px"
         style={{
           overflow: "auto",
-          position: "sticky",
           padding: "1rem",
-          right: 0,
-          top: 0,
         }}
       >
         <Typography.Title level={2} style={{ textAlign: "center" }}>
           Sphere Generator
         </Typography.Title>
-        <Tabs style={{ color: "white" }}>
+        <Tabs defaultActiveKey="3" style={{ color: "white" }}>
           <TabPane tab="Spheres" key="1">
             <SphereTab
               setDefaultSphere={setDefaultSphere}
@@ -79,7 +77,7 @@ function App() {
         </Tabs>
 
         <Row
-          style={{ position: "sticky", top: "100%" }}
+          style={{ position: "sticky", top: "100%", marginTop: "1.5rem" }}
           gutter={16}
           justify="space-around"
         >
@@ -114,6 +112,4 @@ function App() {
       </Sider>
     </Layout>
   );
-}
-
-export default App;
+};

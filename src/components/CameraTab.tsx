@@ -9,7 +9,7 @@ import {
   Typography,
 } from "antd";
 import { FC } from "react";
-import { useShaderSceneContext } from "../../contexts/ShaderScene";
+import { useShaderSceneContext } from "../contexts/ShaderScene";
 const { Option } = Select;
 
 export const CameraTab: FC = () => {

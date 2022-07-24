@@ -1,10 +1,6 @@
-import { Col, Form, Input, InputNumber, Modal, Row, Typography } from "antd";
-import { useShaderSceneContext } from "../../contexts/ShaderScene";
-import {
-  Sphere,
-  SphereConstructorType,
-  SphereType,
-} from "../../objects/Sphere";
+import { Col, Form, Input, InputNumber, Modal, Row } from "antd";
+import { useShaderSceneContext } from "../contexts/ShaderScene";
+import { Sphere, SphereConstructorType, SphereType } from "../objects/Sphere";
 
 export const CreateSphereModal = ({
   defaultSphere,

@@ -1,7 +1,7 @@
 import * as math from "mathjs";
 import nj from "numjs";
 import p5Types from "p5";
-import { drawModeEnum } from "../contexts/Scene";
+import { drawModeEnum } from "../constants";
 
 export type WindowType = {
   width: number[];
@@ -42,7 +42,7 @@ export class Camera {
   public Mjp: number[][] = nj.zeros([4, 4]).tolist();
   private lastProjectionType: drawModeEnum;
 
-  private projectionPlanCenter: number[] = [];
+  public projectionPlanCenter: number[] = [];
   public projectionPlanDistance: number;
 
   public window: WindowType = {} as WindowType;
