@@ -311,7 +311,7 @@ export const CreateSphereModal = ({
           <Col span={12}>
             <Form.Item
               name="n"
-              label="Shadiness"
+              label="Shininess"
               initialValue={defaultSphere ? defaultSphere?.n : 32}
               rules={[{ required: true }]}
             >

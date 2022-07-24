@@ -1,4 +1,5 @@
 # SPHERE GENERATOR
+> by Felipi Lima Matozinho & Pablo Hugen do Santos
 
 App created for final work to the Computer Graphics discipline.
 The app has the objective of implementing a generator of spheres, using its camera, lighting, and coordinates system.
